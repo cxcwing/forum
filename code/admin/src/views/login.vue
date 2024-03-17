@@ -44,13 +44,31 @@
 
 import { ref } from 'vue'
 import axios from 'axios';
+import upLoad from '@/util/upLoad.js'
+import { ElMessage } from 'element-plus'
+import router from '@/router';
+import { useStore } from 'vuex';
+const store = useStore()
 let userForm = ref({})
 let container = ref('container')
-import { ElMessage } from 'element-plus'
+
+
+
 const handleLogin = () => {
     if (userForm.value.username && userForm.value.password) {
-        axios('/adminApi/user/login').then(res=>{
+        
+        axios.post('/adminApi/user/login',userForm).then(res=>{
             console.log(res.data)
+            if(res.data.ok){
+                store.commit("changeIsAddRouter",false)
+                ElMessage.success('登录成功')
+                router.push("/home")
+            }else{
+                ElMessage({
+                    message:"用户名密码不匹配",
+                    type:"error"
+                })
+            }
         })
         console.log(userForm.value)
     } else if (userForm.value.username && !userForm.value.password) {

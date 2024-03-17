@@ -60,6 +60,10 @@ const routes = [
         path:'/tale-manage/taleList',
         component:taleList
     }, 
+    {
+        path:"/",
+        redirect:"/home"
+    },
 ]
 
 export default routes

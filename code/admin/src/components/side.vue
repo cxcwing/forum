@@ -1,28 +1,25 @@
 <template>
-    <el-menu default-active="1" 
+    <div>
+    <el-menu default-active="/home" 
     class="el-menu-vertical-demo"
-    :collapse="false">
-        <el-menu-item index="1">
-            <template #title>
+    :collapse="$store.state.isCollapse"
+    :router="true"
+
+    >
+
+        <el-menu-item  index="/home">
                 <el-icon ><HomeFilled /></el-icon>
-                首页
-            </template>
+                <span>首页</span>
         </el-menu-item>
-        <el-menu-item index="2">
-            <template #title>
-                
-                <el-icon><Avatar /></el-icon>
-                个人中心
-            </template>
-        </el-menu-item>
-        <el-sub-menu @click='handleClose' index="4">
+
+        <el-sub-menu index="4">
             <template #title>
                 <el-icon><UserFilled /></el-icon>
                 <span>用户管理</span>
             </template>
             <el-menu-item-group>
-                <el-menu-item index="4-1">用户列表</el-menu-item>
-                <el-menu-item index="4-2">添加用户</el-menu-item>
+                <el-menu-item index="/user-manage/userList">用户列表</el-menu-item>
+                <el-menu-item index="/user-manage/userAdd">添加用户</el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
 
@@ -32,34 +29,35 @@
                 <span>故事管理</span>
             </template>
             <el-menu-item-group>
-                <el-menu-item index="5-1">故事列表</el-menu-item>
-                <el-menu-item index="5-2">添加故事</el-menu-item>
+                <el-menu-item index="/tale-manage/taleList">故事列表</el-menu-item>
+                <el-menu-item index="/tale-manage/taleAdd">添加故事</el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
 
-        <el-sub-menu index="4">
+        <el-sub-menu index="6">
             <template #title>
                 <el-icon><MessageBox /></el-icon>
                 <span>贴子管理</span>
             </template>
             <el-menu-item-group>
-                <el-menu-item index="4-1">贴子列表</el-menu-item>
-                <el-menu-item index="4-2">添加贴子</el-menu-item>
+                <el-menu-item index="/post-manage/postAdd">贴子列表</el-menu-item>
+                <el-menu-item index="/post-manage/postList">添加贴子</el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
 
     </el-menu>
+</div>
 </template>
 
 <script setup>
+// import {store} from 'vuex'
+import {useStore} from "vuex"
 import { ref } from 'vue'
 import { House,HomeFilled,UserFilled,MessageBox,Avatar,Notebook} from '@element-plus/icons-vue'
+const store = useStore()
+// let isCollapse = false
 
-let isCollapse = false
 
-function handleClose(){
-    return 1
-}
 
 </script>
 

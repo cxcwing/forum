@@ -3,6 +3,6 @@ var UserRouter = express.Router();
 var UserController = require('../../controllers/admin/userController')
 
 
-UserRouter.get(`/adminApi/user/login`,UserController.login)
+UserRouter.post(`/adminApi/user/login`,UserController.login)
 
 module.exports = UserRouter

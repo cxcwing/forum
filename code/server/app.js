@@ -6,7 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var userApi = require('./routes/admin/userAPI.js')
+var userApi = require('./routes/admin/userAPI.js');
+const JWT = require('./util/JWT.js');
 
 var app = express();
 
@@ -23,6 +24,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 app.use('/users', usersRouter);
+
+app.use((req,res,next)=>{
+  if(req.url === '/adminApi/user/login'){//排除登陆接口
+    next()
+    return
+  } 
+  const token = req.headers["authorization"].split(' ')[1]
+  console.log(token)
+  if(token){
+    let payload = JWT.verify(token)
+    console.log(payload,11)
+    if(payload){
+      const newToken = JWT.create({
+        _id:payload._id,
+        username:payload.username
+      },"1d")
+      res.header("authorization",newToken)
+      next()
+    }else{
+      res.status(401).send({errCode:-1,errInfo:"身份验证过期"})
+    }
+    next()
+  }else{
+    return 
+  }
+})
+
 
 app.use(userApi)
 // catch 404 and forward to error handler

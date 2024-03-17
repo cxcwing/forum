@@ -1,0 +1,23 @@
+router.beforeEach((to, from, next) => {
+  if (to.name === 'login') {
+
+    next()
+  } else {
+    if (!localStorage.getItem("token")) {
+      next({
+        path: '/login'
+      })
+    } else {
+      if(1){
+
+      }else{
+        next()
+      }
+     configRoutes()
+
+      next({
+        path:to.fullPath //会死循环
+      })
+    }
+  }
+})
