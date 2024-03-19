@@ -35,7 +35,7 @@ const whichOne=()=> store.state.isCollapse?'64px':'200px'
 }
 .el-main {
     width: 100%;
-    background-color: rgb(82, 135, 135);
+    /* background-color: rgb(82, 135, 135); */
     overflow: auto;
     height: calc(100vh - 60px);
 }
