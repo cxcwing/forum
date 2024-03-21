@@ -16,7 +16,7 @@ axios.interceptors.request.use(function (config) {
 
 axios.interceptors.response.use(function (response) {
     //响应拦截
-    console.log(response.headers.authorization)
+    // console.log(response.headers.authorization)
     const {authorization} = response.headers
     if(authorization){
         localStorage.setItem("token",authorization)

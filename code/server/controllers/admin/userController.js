@@ -9,14 +9,14 @@ const sqlPool = mysql.createPool({
     connectionLimit: 1
 }).promise()
 
-
+ 
 async function login(username, password) {
     let data = await sqlPool.query(`select * from user where username=? and password=?`, [username, password])
     return data
 }
 
 
-const UserController = {
+const UserController = { 
     login: async (req, res) => {
         // console.log(req.body._value.username)
         let { username, password} = req.body._value
@@ -39,10 +39,17 @@ const UserController = {
             })
         }
     },
+    Update:(req,res)=>{
+        console.log(req.file)
+        console.log(req.body)
+        res.send({ 
+            ok:1
+        })
+    }
 
-}
+} 
 
-
+ 
 
 
 

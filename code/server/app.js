@@ -31,11 +31,12 @@ app.use((req,res,next)=>{
     return
   } 
   const token = req.headers["authorization"].split(' ')[1]
-  console.log(token)
+  // console.log(token)
   if(token){
-    let payload = JWT.verify(token)
-    console.log(payload,11)
+    let payload = JWT.verify(token) 
+    // console.log(payload,11)
     if(payload){
+      // console.log('111111111111111111')
       const newToken = JWT.create({
         _id:payload._id,
         username:payload.username
@@ -45,9 +46,9 @@ app.use((req,res,next)=>{
     }else{
       res.status(401).send({errCode:-1,errInfo:"身份验证过期"})
     }
-    next()
+ 
   }else{
-    return 
+     
   }
 })
 

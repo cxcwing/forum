@@ -4,11 +4,18 @@ export default createStore({
   state: {
     isAddRouter:false,
     // isCollapsed:false
-    isCollapse:true
+    isCollapse:true,
+    userFormInfo:{}
   },
   getters: {
   },
   mutations: {
+    changeUserFormInfo(state,value){
+      state.userFormInfo = {
+        ...state.userFormInfo,
+        ...value
+      }
+    },
     changeIsAddRouter(state,value){
       state.isAddRouter = value
     },
@@ -23,6 +30,6 @@ export default createStore({
   modules: {
   },
   plugins: [createPersistedState({
-    paths:["isCollapsed"]
+    paths:["isCollapsed","userFormInfo"]
   })],
 })

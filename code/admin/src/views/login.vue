@@ -61,6 +61,7 @@ const handleLogin = () => {
             console.log(res.data)
             if(res.data.ok){
                 store.commit("changeIsAddRouter",false)
+                store.commit("changeUserFormInfo",res.data.data)
                 ElMessage.success('登录成功')
                 router.push("/home")
             }else{

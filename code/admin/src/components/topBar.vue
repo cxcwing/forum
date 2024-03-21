@@ -9,7 +9,7 @@
             </div>
             <div class="right">
                 <el-dropdown trigger="click">
-                    <el-avatar :size="50" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                    <el-avatar :size="50" :src="avatarUrl" />
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item>退出</el-dropdown-item>
@@ -67,13 +67,15 @@
 </style>
 <script setup>
 import { Menu } from '@element-plus/icons-vue'
-import { handleError } from 'vue';
+import { handleError,computed } from 'vue';
 import { useStore } from 'vuex';
 const store = useStore()
 const handleColl = ()=>{
     store.commit('changeIsCollapse')
     // console.log(store.state.isCollapse)
 }
-
+const avatarUrl = computed(()=>
+    store.state.userFormInfo.avatar?`http://localhost:3200${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
+)
 
 </script>

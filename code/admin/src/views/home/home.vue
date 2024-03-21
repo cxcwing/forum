@@ -13,7 +13,7 @@
         <div class="main-box">
             <el-card class="card1" shadow="always">
                 <div class="left">
-                    <el-avatar :size="110" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                    <el-avatar :size="110" :src="avatarUrl" />
                     <span class="span-name">{{ '寸夕屮' }}</span>
                     <span class="span-role">{{ '管理员' }}</span>
                 </div>
@@ -25,27 +25,31 @@
                     </div>
                 </template>
                 <div class="right">
-                    <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules"
+                    <el-form ref="ruleFormRef" style="max-width: 600px" :model="userForm" :rules="rules"
                         label-width="auto" class="demo-ruleForm" :size="formSize" status-icon>
                         <el-form-item label="用户名" prop="name">
-                            <el-input v-model="ruleForm.name" />
+                            <el-input v-model="userForm.name" />
                         </el-form-item>
                         <el-form-item label="邮箱" prop="emil">
-                            <el-input v-model="ruleForm.emil" />
+                            <el-input v-model="userForm.emil" />
                         </el-form-item>
                         <el-form-item :size="'large'" label="性别"   prop="region">
-                            <el-select  v-model="ruleForm.region" placeholder="Activity zone" class="sel">
-                                <el-option label="保密" value="beijing" />
-                                <el-option label="男" value="shanghai" />
-                                <el-option label="女" value="beijing" />
+                            <el-select  v-model="userForm.gender" placeholder="Activity zone" class="sel">
+                                <el-option label="保密" value="0" />
+                                <el-option label="男" value="1" />
+                                <el-option label="女" value="2" />
                             </el-select>
                         </el-form-item>
                         <el-form-item label="个人介绍" prop="desc">
-                            <el-input v-model="ruleForm.desc" type="textarea" />
+                            <el-input v-model="userForm.desc" type="textarea" />
                         </el-form-item>
                         <el-form-item label="头像" prop="desc">
-                            
+                            <Upload 
+                            :avatar="userForm.avatar"
+                            @handleChange="handleChange"
+                            />
                         </el-form-item>
+                        <el-button @click="handleSubmit" class="btn" type="primary">点击更新</el-button>
                     </el-form>
                 </div>
             </el-card>
@@ -55,18 +59,29 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed,reactive, ref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
-
-const ruleForm = ref({
+import Upload from '@/components/Upload.vue';
+import {useStore} from 'vuex'
+import axios from 'axios';
+import upLoad from '@/util/upLoad';
+const store = useStore()
+const userForm = ref( {
+    name:'寸夕屮',
+    emil:'2627060105@qq.com',
+    avatar:'',
+    gender:'0',
+    introduction:'',
+    file:null
 
 })
-ruleForm.value = {
-    name: '寸夕屮',
-    region: '保密',
-    emil:'2624'
-}
-console.log(ruleForm.value)
+const avatarUrl = computed(()=>
+    store.state.userFormInfo.avatar?`http://localhost:3200${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
+)
+
+const ruleFormRef = ref()
+
+console.log(userForm.value)
 
 const rules = reactive({
     name: [
@@ -79,10 +94,46 @@ const rules = reactive({
     ]
 })
 
+const handleChange = (file)=>{
+    // URL.createObjectURL(file.raw)
+    userForm.value.file = file.raw
+    userForm.value.avatar = URL.createObjectURL(file.raw)
+
+
+}
+
+const handleSubmit = ()=>{
+    // console.log(userForm.value)
+    ruleFormRef.value.validate(async (valid)=>{
+        if(valid){
+            // console.log("OK")
+            // console.log(userForm.value)
+            let obj = {
+                ok :1
+            } 
+            // axios.post(`/adminApi/user/Update`,obj).then(res=>{
+            //     console.log(res.data)
+            // })
+            const res = await upLoad(`/adminApi/user/Update`,userForm.value)
+            if(res.data.ok){
+                console.log(res.data) 
+            }else{
+                console.log('失败捏')
+            }
+        }else{
+            
+        }
+    })
+}
+
+
+
 </script>
 
 <style scoped>
-
+.btn{
+    margin-left: 80px;
+}
 .sel{
     width:200px;
 }

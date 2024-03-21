@@ -1,5 +1,4 @@
 import home from '../views/home/home.vue'
-import center from '../views/center/center.vue'
 
 import userList from '@/views/user-manage/userList.vue'
 import userAdd from '@/views/user-manage/userAdd.vue'
@@ -17,10 +16,6 @@ const routes = [
     {
         path:'/home',
         component:home
-    },
-    {
-        path:'/center',
-        component:center
     },
     {
         path:'/user-manage/userList',
@@ -64,6 +59,7 @@ const routes = [
         path:"/",
         redirect:"/home"
     },
+
 ]
 
 export default routes
