@@ -1,48 +1,42 @@
 <template>
-<div>
+  <div>
 
-        <el-upload
-        class="avatar-uploader"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :show-file-list="false"
-        :auto-upload="false"
-        :on-change="handleChange"
-        :on-success="handleAvatarSuccess"
-        >
-        <img v-if="porps.avatar" :src="porps.avatar" class="avatar" />
-        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-        </el-upload>
-</div>
-   
+    <el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+      :show-file-list="false" :auto-upload="false" :on-change="handleChange" :on-success="handleAvatarSuccess">
+      <img v-if="porps.avatar" :src="imageUrl" class="avatar" />
+      <el-icon v-else class="avatar-uploader-icon">
+        <Plus />
+      </el-icon>
+    </el-upload>
+  </div>
+
 </template>
 
 <script setup>
-import { ref} from 'vue'
+import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { UploadProps } from 'element-plus'
-const imageUrl = ref()
-const emi =defineEmits("[handleChange]")
 
-const porps =  defineProps({
-  avatar:String
+const emi = defineEmits("[handleChange]")
+
+const porps = defineProps({
+  avatar: String
 })
-
+const imageUrl = computed(() =>
+  porps.avatar.includes('blob') ?porps.avatar: `http://localhost:3000${porps.avatar}`
+)
 console.log(porps.avatar)
-const handleChange = (file)=>{
-    console.log('aaaaaaaaaaa')
-    emi('handleChange',file)
-    
-}
-const handlePictureCardPreview=(file)=>{
-    imageUrl =  file.url
-    console.log(imageUrl,2222)
+const handleChange = (file) => {
+
+  emi('handleChange', file)
+
 }
 
-const handleAvatarSuccess = (res,file)=>{
-    console.log('1')
+const handleAvatarSuccess = (res, file) => {
+  console.log('1')
 }
-const beforeAvatarUpload = ()=>{
+const beforeAvatarUpload = () => {
 
 }
 </script>
@@ -57,7 +51,7 @@ const beforeAvatarUpload = ()=>{
   background-position: center;
 }
 
-.avatar-uploader  {
+.avatar-uploader {
   width: 178px;
   height: 178px;
   display: block;
@@ -83,5 +77,4 @@ const beforeAvatarUpload = ()=>{
   height: 178px;
   text-align: center;
 }
-
 </style>

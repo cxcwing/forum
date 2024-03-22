@@ -4,9 +4,7 @@ function upLoad(path,userForm){
     const params = new FormData()
     for(let i in userForm){
         params.append(i,userForm[i])
-        console.log(userForm[i])
     }
-    console.log(params)
     return axios.post(path,params,{
         headers:{
             "Content-Type":"multipart/form-data"

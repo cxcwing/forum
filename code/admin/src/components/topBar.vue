@@ -12,7 +12,7 @@
                     <el-avatar :size="50" :src="avatarUrl" />
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item>退出</el-dropdown-item>
+                            <el-dropdown-item @click="handleExit">退出</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -69,13 +69,18 @@
 import { Menu } from '@element-plus/icons-vue'
 import { handleError,computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 const store = useStore()
 const handleColl = ()=>{
     store.commit('changeIsCollapse')
     // console.log(store.state.isCollapse)
 }
 const avatarUrl = computed(()=>
-    store.state.userFormInfo.avatar?`http://localhost:3200${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
+    store.state.userFormInfo.avatar?`http://localhost:3000${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
 )
-
+const handleExit = ()=>{
+    localStorage.removeItem('token'),
+    router.push("/login")
+}
 </script>

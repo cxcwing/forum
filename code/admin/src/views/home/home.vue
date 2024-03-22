@@ -27,11 +27,11 @@
                 <div class="right">
                     <el-form ref="ruleFormRef" style="max-width: 600px" :model="userForm" :rules="rules"
                         label-width="auto" class="demo-ruleForm" :size="formSize" status-icon>
-                        <el-form-item label="用户名" prop="name">
-                            <el-input v-model="userForm.name" />
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="userForm.username" />
                         </el-form-item>
-                        <el-form-item label="邮箱" prop="emil">
-                            <el-input v-model="userForm.emil" />
+                        <el-form-item label="邮箱" prop="email">
+                            <el-input v-model="userForm.email" />
                         </el-form-item>
                         <el-form-item :size="'large'" label="性别"   prop="region">
                             <el-select  v-model="userForm.gender" placeholder="Activity zone" class="sel">
@@ -40,8 +40,8 @@
                                 <el-option label="女" value="2" />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="个人介绍" prop="desc">
-                            <el-input v-model="userForm.desc" type="textarea" />
+                        <el-form-item label="个人介绍" prop="introduction">
+                            <el-input v-model="userForm.introduction" type="textarea" />
                         </el-form-item>
                         <el-form-item label="头像" prop="desc">
                             <Upload 
@@ -66,17 +66,18 @@ import {useStore} from 'vuex'
 import axios from 'axios';
 import upLoad from '@/util/upLoad';
 const store = useStore()
+const {username,email,avatar,gender,introduction} = store.state.userFormInfo
 const userForm = ref( {
-    name:'寸夕屮',
-    emil:'2627060105@qq.com',
-    avatar:'',
-    gender:'0',
-    introduction:'',
+    username,
+    email,
+    avatar,
+    gender,
+    introduction,
     file:null
 
 })
 const avatarUrl = computed(()=>
-    store.state.userFormInfo.avatar?`http://localhost:3200${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
+    store.state.userFormInfo.avatar?`http://localhost:3000${store.state.userFormInfo.avatar}`:`https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png`
 )
 
 const ruleFormRef = ref()
@@ -84,11 +85,11 @@ const ruleFormRef = ref()
 console.log(userForm.value)
 
 const rules = reactive({
-    name: [
+    username: [
         { required: true, message: '输入用户名', trigger: 'blur' },
 
     ],
-    emil: [
+    email: [
         { required: true, message: '请输入邮箱', trigger: 'blur' },
 
     ]
@@ -116,7 +117,12 @@ const handleSubmit = ()=>{
             // })
             const res = await upLoad(`/adminApi/user/Update`,userForm.value)
             if(res.data.ok){
-                console.log(res.data) 
+                console.log(res.data.data) 
+                userForm.value = {
+                    ...userForm.value,
+                    ...res.data.data
+                }
+                store.commit("changeUserFormInfo",res.data.data)
             }else{
                 console.log('失败捏')
             }
