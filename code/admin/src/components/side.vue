@@ -1,6 +1,7 @@
 <template>
     <div>
-    <el-menu default-active="/home" 
+    <el-menu 
+    :default-active="defultHref" 
     class="el-menu-vertical-demo"
     :collapse="$store.state.isCollapse"
     :router="true"
@@ -56,8 +57,12 @@ import { ref } from 'vue'
 import { House,HomeFilled,UserFilled,MessageBox,Avatar,Notebook} from '@element-plus/icons-vue'
 const store = useStore()
 // let isCollapse = false
-
-
+// console.log()
+let str1 = window.location.href.split('/')
+let itemIndex = str1.length
+const defultHref = ref('')
+defultHref.value = `/${str1[itemIndex - 2]}/${str1[itemIndex - 1]}`
+// console.log(defultHref.value)
 
 </script>
 

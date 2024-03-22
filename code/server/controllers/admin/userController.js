@@ -33,6 +33,19 @@ async function getList(){
     return data
 }
 
+async function toUserUpdate(_id,username,password,email,gender,introduction,vip,role,avatar){
+    if(avatar!=''){
+        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=?,avatar=? where _id=?`,[username,password,email,gender,introduction,vip,role,avatar,_id])
+    }else{
+        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=? where _id=?`,[username,password,email,gender,introduction,vip,role,_id])
+    }
+}
+
+async function toUserADD(username,password,email,gender,introduction,avatar){
+    await sqlPool.query('INSERT INTO `users`(`username`, `password`,`email`,`gender`,`introduction`,`avatar`) VALUES (?,?,?,?,?,?)',[username,password,email,gender,introduction,avatar])
+}
+
+
 const UserController = {
     login: async (req, res) => {
         // console.log(req.body._value.username)
@@ -60,7 +73,7 @@ const UserController = {
     Update: async (req, res) => {
         const token = JWT.verify(req.headers["authorization"].split(' ')[1])
         let { _id } = token
-        console.log(_id)
+        // console.log(_id)
         let { username, email, gender, introduction } = req.body
         
         let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ""
@@ -99,10 +112,49 @@ const UserController = {
     getUserList:async(req,res)=>{
         // console.log(req.body)
         let list = await getList()
-        console.log(list[0])
+        // console.log(list[0])
         res.send({
             ok:1,
             data:list[0]
+        })
+    },
+    userUpdate:async(req,res)=>{
+        // console.log(req.body)
+        let {_id,username,password,email,gender,introduction,vip,role} = req.body
+        // console.log(req.file)
+        _id = Number(_id)
+        let avatar = req.file?`/${req.file.destination.split('/')[1]}/${req.file.filename}`:''
+        await toUserUpdate(_id,username,password,email,gender,introduction,vip,role,avatar)
+
+        res.send({
+            ok:1,
+            data:{
+                _id,
+                username,
+                password,
+                email,
+                gender,
+                introduction,
+                vip,
+                role,
+                avatar
+            }
+        })
+    },
+    userDelete:async (req,res)=>{
+        // console.log(req.body)
+        res.send({
+            ok:1,
+
+        })
+    },
+    userAdd:async (req,res)=>{
+        // console.log(req.body)
+        let {username,password,email,gender,introduction} = req.body
+        let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        await toUserADD(username,password,email,gender,introduction,avatar)
+        res.send({
+            ok:1,
         })
     }
 

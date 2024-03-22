@@ -30,6 +30,6 @@ export default createStore({
   modules: {
   },
   plugins: [createPersistedState({
-    paths:["isCollapsed","userFormInfo"]
+    paths:["isCollapse","userFormInfo"]
   })],
 })

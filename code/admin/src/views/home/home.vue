@@ -60,7 +60,7 @@
 
 <script setup>
 import { computed,reactive, ref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
+import { FormInstance, FormRules,ElMessage} from 'element-plus'
 import Upload from '@/components/Upload.vue';
 import {useStore} from 'vuex'
 import axios from 'axios';
