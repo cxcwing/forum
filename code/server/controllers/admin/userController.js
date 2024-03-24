@@ -55,12 +55,15 @@ const UserController = {
         // console.log(_id)
         let user = await login(username, password)  
         // console.log(user[0][0])
+        let data = user[0][0]
+        delete data.password
         if (user[0].length) {
             let _id = user[0][0]._id
             const token = JWT.create({ username, _id }, '1d')
             res.header("Authorization", token)
             res.send({
                 ok: 1,
+                data
             })
 
         } else {
@@ -69,6 +72,11 @@ const UserController = {
                 error: "用户名密码不匹配"
             })
         }
+    },
+    home:(req,res)=>{
+        res.send({
+            ok:1
+        })
     },
     Update: async (req, res) => {
         const token = JWT.verify(req.headers["authorization"].split(' ')[1])

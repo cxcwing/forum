@@ -59,13 +59,16 @@
 </template>
 
 <script setup>
-import { computed,reactive, ref } from 'vue'
+import { computed,reactive, ref,onMounted } from 'vue'
 import { FormInstance, FormRules,ElMessage} from 'element-plus'
 import Upload from '@/components/Upload.vue';
 import {useStore} from 'vuex'
 import axios from 'axios';
 import upLoad from '@/util/upLoad';
 const store = useStore()
+onMounted(()=>{
+    axios.get('/adminApi/user/home')
+})
 const {username,email,avatar,gender,introduction} = store.state.userFormInfo
 const userForm = ref( {
     username,

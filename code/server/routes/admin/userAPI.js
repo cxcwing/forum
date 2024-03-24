@@ -27,6 +27,7 @@ let createFolder = function(folder) {
 
 let upload = multer({ storage: storage })
 UserRouter.post(`/adminApi/user/login`,UserController.login)
+UserRouter.get(`/adminApi/user/home`,UserController.home)
 UserRouter.post(`/adminApi/user/Update`,upload.single('file'),UserController.Update)
 UserRouter.get(`/adminApi/user/getUserList`,UserController.getUserList)
 UserRouter.post(`/adminApi/user/userUpdate`,upload.single('file'),UserController.userUpdate)

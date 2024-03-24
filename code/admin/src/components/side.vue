@@ -58,10 +58,13 @@ import { House,HomeFilled,UserFilled,MessageBox,Avatar,Notebook} from '@element-
 const store = useStore()
 // let isCollapse = false
 // console.log()
+
 let str1 = window.location.href.split('/')
+
+
 let itemIndex = str1.length
 const defultHref = ref('')
-defultHref.value = `/${str1[itemIndex - 2]}/${str1[itemIndex - 1]}`
+defultHref.value = window.location.href.includes('home')?'/home':`/${str1[itemIndex - 2]}/${str1[itemIndex - 1]}`
 // console.log(defultHref.value)
 
 </script>
