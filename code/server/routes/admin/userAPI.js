@@ -24,7 +24,7 @@ let createFolder = function(folder) {
       // cb(null, Date.now() + '-' + file.originalname) // 加上Date.now()可以避免命名重复
     }
   })
-
+ 
 let upload = multer({ storage: storage })
 UserRouter.post(`/adminApi/user/login`,UserController.login)
 UserRouter.get(`/adminApi/user/home`,UserController.home)
@@ -33,5 +33,6 @@ UserRouter.get(`/adminApi/user/getUserList`,UserController.getUserList)
 UserRouter.post(`/adminApi/user/userUpdate`,upload.single('file'),UserController.userUpdate)
 UserRouter.post(`/adminApi/user/userDelete`,UserController.userDelete)
 UserRouter.post(`/adminApi/user/userAdd`,upload.single('file'),UserController.userAdd)
- 
+UserRouter.post(`/adminApi/user/imageAdd`,upload.single('upload'),UserController.imageAdd)
+
 module.exports = UserRouter  

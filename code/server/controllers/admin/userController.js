@@ -164,6 +164,14 @@ const UserController = {
         res.send({
             ok:1,
         })
+    },
+    imageAdd:(req,res)=>{
+        // console.log('aaaa')
+        // console.log(req.file)
+        let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        res.send({
+            "url": `http://localhost:3000/${avatar}`  
+        })
     }
 
 }

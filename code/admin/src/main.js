@@ -5,4 +5,5 @@ import store from './store'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/util/axios.config'
-createApp(App).use(store).use(router).use(ElementPlus).mount('#app')
+import CKEditor from '@ckeditor/ckeditor5-vue';
+createApp(App).use(store).use(CKEditor).use(router).use(ElementPlus).mount('#app')

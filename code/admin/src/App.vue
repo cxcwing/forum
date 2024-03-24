@@ -20,4 +20,9 @@
 ::-webkit-scrollbar-thumb{
   background:#1890ff;
 }
+.ck-editor__editable_inline:not(.ck-comment__input *) {
+    /* width: 80%; */
+    min-height: 400px;
+    overflow-y: auto;
+}
 </style>

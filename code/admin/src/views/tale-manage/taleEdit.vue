@@ -1,3 +1,5 @@
 <template>
-    <div>tableEdit</div>
-</template>
+    <div>
+        ckeditor5
+    </div>
+    </template>
