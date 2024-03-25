@@ -28,7 +28,7 @@ const imageUrl = computed(() =>
 )
 console.log(porps.avatar)
 const handleChange = (file) => {
-
+  console.log(porps.avatar,'xxxxxxxxxxxxxxxxxx')
   emi('handleChange', file)
 
 }

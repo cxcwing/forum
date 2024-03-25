@@ -47,3 +47,35 @@ let createFolder = function(folder) {
   })
 
 let upload = multer({ storage: storage })
+
+
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+ 
+.image_resized {
+    max-width: 100%;
+}
+
+.image-style-side {
+    float: right;
+    margin-left: var(--ck-image-style-spacing);
+}
+
+.image-style-align-left {
+    float: left;
+    margin-right: var(--ck-image-style-spacing);
+}
+
+.image-style-align-center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.image-style-align-right {
+    float: right;
+    margin-left: var(--ck-image-style-spacing);
+}

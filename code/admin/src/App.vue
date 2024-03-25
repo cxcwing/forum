@@ -24,5 +24,6 @@
     /* width: 80%; */
     min-height: 400px;
     overflow-y: auto;
+    max-height: 600px;
 }
 </style>

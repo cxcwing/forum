@@ -27,3 +27,26 @@ let users = {
     toGood:[],//点赞作品id
     collection:[]//收藏作品id
 }
+
+let tale = {
+    id:'0',
+    title:'',
+    author:'',
+    time:'',
+    // beGood:Number,
+    whoGood:[],
+    whoCollection:[],
+    lookNumber:'',
+    Comment:['id'],
+    type:'',
+    cover:'',
+    isPublish:'',
+    content:''
+}
+
+let Comment = {
+    id:'',
+    whoComment:'',
+    time:'',
+
+}
