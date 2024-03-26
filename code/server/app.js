@@ -8,6 +8,7 @@ const cors = require('cors');
 // var usersRouter = require('./routes/users');
 var userApi = require('./routes/admin/userAPI.js');
 var taleApi = require('./routes/admin/taleAPI.js');
+var postApi = require('./routes/admin/postAPI.js');
 const JWT = require('./util/JWT.js');
 
 var app = express();
@@ -56,6 +57,7 @@ app.use((req,res,next)=>{
 
 app.use(userApi)
 app.use(taleApi)
+app.use(postApi)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

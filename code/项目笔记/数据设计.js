@@ -43,6 +43,21 @@ let tale = {
     isPublish:'',
     content:''
 }
+let post = {
+    id:'0',
+    title:'',
+    author:'',
+    time:'',
+    // beGood:Number,
+    whoGood:[],
+    whoCollection:[],
+    lookNumber:'',
+    Comment:['id'],
+    type:'',
+    cover:'',
+    isPublish:'',
+    content:''
+}
 
 let Comment = {
     id:'',

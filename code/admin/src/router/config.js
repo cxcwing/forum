@@ -39,7 +39,7 @@ const routes = [
         component:postAdd
     },
     {
-        path:'/post-manage/postEdit',
+        path:'/post-manage/postEdit/:id',
         component:postEdit
     },
     //

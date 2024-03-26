@@ -13,11 +13,15 @@
         <el-table size="large" :data="taleList" style="width: 100%">
             <el-table-column label="封面" width="180">
                 <template #default="scope">
-                    <div v-if="scope.row.cover"><el-avatar :size="50"
-                            :src="`http://localhost:3000/${scope.row.cover}`" /></div>
+                    <div v-if="scope.row.cover">
+                        <!-- <el-avatar :size="50"
+                            :src="`http://localhost:3000/${scope.row.cover}`" /> -->
+                            <el-image style="width: 80px; height: 80px" :src="`http://localhost:3000/${scope.row.cover}`" fit="cover" />
+                        </div>
                     <div v-else>
-                        <el-avatar :size="50"
-                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" />
+                        <!-- <el-avatar :size="50"
+                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" /> -->
+                            <el-image style="width: 80px; height: 80px" src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" fit="cover" />
                     </div>
                 </template>
             </el-table-column>
@@ -86,8 +90,7 @@ import upLoad from '@/util/upLoad';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 // import { ElNotification } from 'element-plus'
 const router = useRouter()
-const userList = ref([])
-const userForm = ref(true)
+
 
 const dialogVisible = ref(false)
 const taleList = ref([])
@@ -161,20 +164,7 @@ const handleChange = (file) => {
 }
 
 
-const rules = reactive({
 
-    username: [
-        { required: true, message: '输入用户名', trigger: 'blur' },
-
-    ],
-    password: [
-        { required: true, message: '输入密码', trigger: 'blur' },
-
-    ],
-    email: [
-        { required: true, message: '请输入邮箱', trigger: 'blur' },
-    ]
-})
 
 onMounted(async () => {
     getTaleList()

@@ -6,7 +6,7 @@
                     <p style="color: black; font-weight:500;">草吧后台管理中心</p>
                 </el-breadcrumb-item>
                 <el-breadcrumb-item>
-                    <h2 class="homeXie" href="/">首页</h2>
+                    <h2 class="homeXie" href="/">添加故事</h2>
                 </el-breadcrumb-item>
             </el-breadcrumb>
             <el-form ref="ruleFormRef" style="max-width: 100%;" :model="taleForm" :rules="rules" label-width="auto"

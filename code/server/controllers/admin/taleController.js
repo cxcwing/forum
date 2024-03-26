@@ -95,6 +95,7 @@ const taleController = {
     },
     taleDelete:async (req,res)=>{
         let id = req.query.id
+        
         console.log(id)
         await toTaleDelete(id)
         res.send({

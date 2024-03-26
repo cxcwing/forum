@@ -45,10 +45,14 @@ async function toUserADD(username,password,email,gender,introduction,avatar){
     await sqlPool.query('INSERT INTO `users`(`username`, `password`,`email`,`gender`,`introduction`,`avatar`) VALUES (?,?,?,?,?,?)',[username,password,email,gender,introduction,avatar])
 }
 
+async function toUserDelete(_id){
+    await sqlPool.query(`delete from users where _id = ?`,[_id])
+}
+
 
 const UserController = {
     login: async (req, res) => {
-        // console.log(req.body._value.username)
+        // console.log(req.body._value.username) 
         console.log(req.body)
         let { username, password } = req.body._value
         // console.log(username, password)
@@ -139,7 +143,7 @@ const UserController = {
             data:{
                 _id,
                 username,
-                password,
+                password, 
                 email,
                 gender,
                 introduction,
@@ -151,11 +155,16 @@ const UserController = {
     },
     userDelete:async (req,res)=>{
         // console.log(req.body)
+        let _id = Number(req.query._id)
+        // console.log(req.query)
+        // console.log(_id)
+        await toUserDelete(_id)
+
         res.send({
             ok:1,
 
         })
-    },
+    }, 
     userAdd:async (req,res)=>{
         // console.log(req.body)
         let {username,password,email,gender,introduction} = req.body

@@ -87,6 +87,17 @@
         </template>
     </el-dialog>
 
+    <el-dialog v-model="DeleteVisible" title="确认删除" width="500" >
+        <span>确定要删除该用户吗</span>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="DeleteVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleSureDelete">
+                    确定
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -99,7 +110,7 @@ const userList = ref([])
 const userForm = ref({})
 
 const dialogVisible = ref(false)
-
+const DeleteVisible = ref(false)
 const handleChange = (file) => {
     userForm.value.file = file.raw
     userForm.value.avatar = URL.createObjectURL(file.raw)
@@ -126,7 +137,7 @@ onMounted(() => {
 const getUserList = async () => {
     let res = await axios.get(`/adminApi/user/getUserList`)
     if (res.data.ok) {
-        console.log(res.data.data)
+        // console.log(res.data.data)
         userList.value = res.data.data
     } else {
         console.log("获取失败")
@@ -141,10 +152,19 @@ const handleEdit = (data) => {
     userForm.value = data
 
 }
-
-const handleDelete = async (data) => {
-    let _id = data._id
-    axios.post()
+let deleteId = new Number()
+// handleDelete
+const handleDelete = (data) => {
+     deleteId = data._id
+    console.log(deleteId)
+    DeleteVisible.value = true
+    
+}
+const handleSureDelete = async ()=>{
+    console.log(deleteId,'11111111111')
+    DeleteVisible.value = false
+   let res = await axios.delete(`/adminApi/user/userDelete?_id=${deleteId}`)
+   getUserList()
 }
 
 const handleSure = async () => {

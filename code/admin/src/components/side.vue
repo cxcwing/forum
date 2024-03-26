@@ -41,8 +41,8 @@
                 <span>贴子管理</span>
             </template>
             <el-menu-item-group>
-                <el-menu-item index="/post-manage/postAdd">贴子列表</el-menu-item>
-                <el-menu-item index="/post-manage/postList">添加贴子</el-menu-item>
+                <el-menu-item index="/post-manage/postList">贴子列表</el-menu-item>
+                <el-menu-item index="/post-manage/postAdd">添加贴子</el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
 

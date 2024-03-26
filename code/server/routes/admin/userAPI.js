@@ -31,8 +31,9 @@ UserRouter.get(`/adminApi/user/home`,UserController.home)
 UserRouter.post(`/adminApi/user/Update`,upload.single('file'),UserController.Update)
 UserRouter.get(`/adminApi/user/getUserList`,UserController.getUserList)
 UserRouter.post(`/adminApi/user/userUpdate`,upload.single('file'),UserController.userUpdate)
-UserRouter.post(`/adminApi/user/userDelete`,UserController.userDelete)
+UserRouter.delete(`/adminApi/user/userDelete`,UserController.userDelete)
 UserRouter.post(`/adminApi/user/userAdd`,upload.single('file'),UserController.userAdd)
 UserRouter.post(`/adminApi/user/imageAdd`,upload.single('upload'),UserController.imageAdd)
+// UserRouter.delete(`/adminApi/user/userDelete`,UserController.userDelete)
 
 module.exports = UserRouter  
