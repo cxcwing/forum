@@ -24,7 +24,7 @@ const porps = defineProps({
   avatar: String
 })
 const imageUrl = computed(() =>
-  porps.avatar.includes('blob') ?porps.avatar: `http://localhost:3000${porps.avatar}`
+  porps.avatar.includes('blob') ?porps.avatar: `http://localhost:3000/${porps.avatar}`
 )
 console.log(porps.avatar)
 const handleChange = (file) => {

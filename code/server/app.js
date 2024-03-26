@@ -4,8 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');  
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// var indexRouter = require('./routes/index');
+// var usersRouter = require('./routes/users');
 var userApi = require('./routes/admin/userAPI.js');
 var taleApi = require('./routes/admin/taleAPI.js');
 const JWT = require('./util/JWT.js');
@@ -22,9 +22,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 
-app.use('/users', usersRouter);
+// app.use('/users', usersRouter);
 
 app.use((req,res,next)=>{
   if(req.url === '/adminApi/user/login'){//排除登陆接口

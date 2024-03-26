@@ -28,6 +28,10 @@ let createFolder = function(folder) {
 
 TaleRouter.post(`/adminApi/tale/taleAdd`,upload.single('file'),taleController.taleAdd)
 TaleRouter.get(`/adminApi/tale/getTaleList`,taleController.getTaleList)
+TaleRouter.put(`/adminApi/tale/updateIsPublish`,taleController.changePublish)
+TaleRouter.get(`/adminApi/tale/getThisTale`,taleController.getThisTale)
+TaleRouter.post(`/adminApi/tale/taleUpdate`,upload.single('file'),taleController.taleUpdate)
+TaleRouter.delete(`/adminApi/tale/taleDelete`,taleController.taleDelete)
 
 
 module.exports = TaleRouter

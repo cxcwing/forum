@@ -48,7 +48,7 @@ const routes = [
         component:taleAdd
     }, 
     {
-        path:'/tale-manage/taleEdit',
+        path:'/tale-manage/taleEdit/:id',
         component:taleEdit
     }, 
     {

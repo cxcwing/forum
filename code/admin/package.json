@@ -23,7 +23,7 @@
     "@ckeditor/ckeditor5-image": "^41.2.1",
     "@ckeditor/ckeditor5-link": "^41.2.1",
     "@ckeditor/ckeditor5-list": "^41.2.1",
-    "@ckeditor/ckeditor5-paragraph": "^41.2.1",
+    "@ckeditor/ckeditor5-paragraph": "^41.2.1", 
     "@ckeditor/ckeditor5-special-characters": "^41.2.1",
     "@ckeditor/ckeditor5-table": "^41.2.1",
     "@ckeditor/ckeditor5-theme-lark": "^41.2.1",

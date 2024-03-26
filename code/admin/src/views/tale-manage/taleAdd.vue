@@ -60,6 +60,7 @@
 import Upload from '@/components/Upload.vue';
 import { ref, reactive } from 'vue';
 import { useStore } from 'vuex';
+import {useRouter,useRoute} from 'vue-router'
 import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { Bold, Code, Italic, Strikethrough, Subscript, Superscript, Underline } from '@ckeditor/ckeditor5-basic-styles';
@@ -83,6 +84,8 @@ import { SpecialCharacters, SpecialCharactersEssentials } from '@ckeditor/ckedit
 import axios from 'axios';
 import { ElNotification } from 'element-plus'
 import upLoad from '@/util/upLoad';
+const router = useRouter()
+const route = useRoute()
 const store = useStore()
 const dialogVisible = ref(false)
 const ruleFormRef = ref()
@@ -96,6 +99,8 @@ const taleForm = ref({
     author: '',
     authorId: '',
 })
+
+
 const handleChange = (file) => {
     // console.log(file,'')
     console.log(taleForm.value.cover)
