@@ -22,44 +22,6 @@ const router = createRouter({
   routes//
 })
 
-// routesConfig.forEach(item =>{
-//   router.addRoute("mainBox",item)
-// })
-
-// router.addRoute("mainBox",{
-//   path:'/home',
-//   component:home
-// })
-
-//路由拦截
-// router.beforeEach((to, from, next) => {
-//   if (to.name === 'login') {
-
-//     next()
-//   } else {
-//     if (!localStorage.getItem("token")) {
-//       console.log("1111111111")
-//       next({
-//         path: '/login'
-//       })
-//     } else {
-//       if (!store.state.isAddRouter) {
-//         console.log(store.state.isAddRouter)
-//         configRoutes()
-//         next({
-//           path: to.fullPath
-//         })
-
-//       } else {
-//         next()
-//       }
-
-//     }
-//   }
-// })
-
-
-
 
 
 const ConfigRouter = () => {

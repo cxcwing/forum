@@ -9,8 +9,6 @@
 
                     <topBar></topBar>
                 </el-header>
-           
-
                 <el-main id='el-main'>
                     <router-view></router-view>
                 </el-main>
