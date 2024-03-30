@@ -1,5 +1,5 @@
 var express = require("express");   
-var FroumRouter = express.Router();
+var FroumViewRouter = express.Router();
 var FroumController = require('../../controllers/froum/froumController')
 const multer  = require('multer')
 let fs = require('fs');
@@ -24,6 +24,13 @@ let createFolder = function(folder) {
   })
  
 let upload = multer({ storage: storage })
-FroumRouter.get(`/froumAPI/froumView/getPostList`,FroumController.getPostList)
 
-module.exports = FroumRouter    
+
+FroumViewRouter.get(`/froumAPI/froumView/getPostList`,FroumController.getPostList)
+
+
+FroumViewRouter.post('/froumApi/froum/captchaSend',FroumController.captchaSend)
+FroumViewRouter.post('/froumApi/froum/register',FroumController.register)
+FroumViewRouter.post('/froumApi/froum/login',FroumController.login)
+
+module.exports = FroumViewRouter    

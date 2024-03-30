@@ -2,16 +2,16 @@
     <div class="top">
 
         <div class='left'>
-            <el-menu :ellipsis="false" active-text-color="#02c9a6" id="el-menu" :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+            <el-menu :router="true" :ellipsis="false" active-text-color="#02c9a6" id="el-menu" :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
                 @select="handleSelect">
                 <div class="logo">
                     草吧
                 </div>
-                <el-menu-item index="1">首页</el-menu-item>
-                <el-menu-item index="2">故事</el-menu-item>
-                <el-menu-item index="3">贴子</el-menu-item>
+                <el-menu-item index="/tale">故事</el-menu-item>
+                <el-menu-item index="/post">贴子</el-menu-item>
+                <el-menu-item index="/home">意见征集</el-menu-item>
                 <div class="searchInput">
-                    <el-input id="search" v-model="search" size="large" style=" min-width: 400px;;max-width: 500px;" placeholder="搜索"
+                    <el-input id="search" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
                         class="input-with-select">
                         <template #append>
                             <el-button :icon="Search" />
@@ -20,29 +20,29 @@
                 </div>
                 <div class='avatar'>
                     <el-avatar @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
-                        src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" />
+                        :src='`http://localhost:3000${userForm.avatar}`'/>
                     <div @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
 
-                        <span class="username">寸夕草</span>
+                        <span class="username">{{ userForm.username }}</span>
                         <div class="idLevelBox">
                             <span :class="idLevel">普通用户</span>
-                            <span>lv5</span>
+                            <span>lv{{ userForm.level }}</span>
                         </div>
                         <div class="powerBox">
-                            <span class="power">能量 :10</span>
+                            <span class="power">能量 :{{ userForm.power}}</span>
                         </div>
-                        <div class="goodBox">
+                        <div  class="goodBox">
                             <div class="good">
-                                <p class="goodTop">166</p>
-                                <p class="goodFooter goodFooter">点赞</p>
+                                <p class="goodTop">{{howCollection}}</p>
+                                <p class="goodFooter goodFooter">收藏</p>
                             </div>
-                            <div class="beGood">
-                                <p class="goodTop">12</p>
-                                <p class="goodFooter beGoodFooter">被点赞</p>
+                            <div  class="beGood">
+                                <p class="goodTop">{{ userForm.taleNum }}</p>
+                                <p class="goodFooter beGoodFooter">故事</p>
                             </div>
-                            <div class="beShou">
-                                <p class="goodTop">54</p>
-                                <p class="goodFooter beShouFooter">被收藏</p>
+                            <div  class="beShou">
+                                <p class="goodTop">{{ userForm.postNum }}</p>
+                                <p class="goodFooter beShouFooter">贴子</p>
                             </div>
 
                         </div>
@@ -67,7 +67,7 @@
                             </el-icon>
                         </div>
 
-                        <div class="exit goToBox">
+                        <div @click="handleExit" class="exit goToBox">
                             <el-icon>
                                 <SwitchButton />
                             </el-icon>
@@ -79,24 +79,24 @@
                     </div>
                 </div>
             </el-menu>
-
         </div>
 
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,onMounted,computed } from 'vue'
 import { Search, EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
-
-const activeIndex = ref('1')
-
+import { useStore } from 'vuex';
+const store = useStore()
+const activeIndex = ref('/tale')
+const userForm = ref({})
 const search = ref('')
 const form = ref('form')
 const avatarClass = ref('one')
 const idLevel = ref('idLevel')
 const avatarHover = () => {
-    console.log(1)
+    // console.log(1)
     form.value = 'form formHover'
     avatarClass.value = 'one Hover'
 }
@@ -104,6 +104,28 @@ const mouseOut = () => {
     form.value = 'form'
     avatarClass.value = 'one'
 }
+const handleExit = ()=>{
+    localStorage.removeItem('Ctoken')
+    localStorage.removeItem('vuex')
+    window.location.href = '/login'
+}
+const howCollection = computed(()=>{
+    // userForm.collection===null?0:userForm.collection.length
+    if(userForm.value.collection === null){
+        return 0
+    }else if(userForm.value.collection !=null){
+        return userForm.value.collection.length
+    }
+})
+onMounted(()=>{
+    // console.log(window.location.href)
+
+   let arr1 = window.location.href.split('/')
+    // console.log(window.location.href.split('/')[arr1.length - 1])
+    activeIndex.value=`/${window.location.href.split('/')[arr1.length - 1]}`
+    userForm.value = store.state.userFormInfo
+
+})
 
 </script>
 
@@ -304,8 +326,10 @@ const mouseOut = () => {
 
 .top {
     /* height: 6px; */
+    position: sticky;
     width: 100%;
     background-color: white;
+    top:0;
     /* display: grid; */
     /* grid-template-columns: 1fr 1fr; */
 }
@@ -335,7 +359,7 @@ const mouseOut = () => {
     line-height: 60px;
     background: rgb(0, 246, 148);
     /* background: linear-gradient(0deg, rgba(0, 246, 148, 1) 0%, rgba(0, 255, 222, 1) 100%); */
-
+ 
     font-size: 30px;
     font-weight: bold;
     background-image: -webkit-linear-gradient(0deg, rgba(0, 246, 148, 1) 0%, rgba(0, 255, 222, 1) 100%); 

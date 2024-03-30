@@ -4,12 +4,15 @@
             <div class="container-form container-signup">
                 <div action="#" class="form" id="form1">
                     <h2 class="form-title">注册账号</h2>
-                    <input type="email" v-model="userForm.email" placeholder="email" class="Tinput" required>
-                    <input type="text" v-model="userForm.username" placeholder="username" class="Tinput" required>
-                    <input type="password" v-model="userForm.password" placeholder="password" class="Tinput" required>
-                    <div>
-                        <input type="password" v-model="userForm.password" placeholder="请输入验证码" class="Tinput" required>
-                        <div>点击获取验证码</div>
+                    <input type="email" v-model="userRegister.email" placeholder="email" class="Tinput" required>
+                    <input type="text" v-model="userRegister.username" placeholder="username" class="Tinput" required>
+                    <input type="password" v-model="userRegister.password" placeholder="password" class="Tinput"
+                        required>
+                    <div class="get-captcha">
+                        <input type="text" v-model="userRegister.captcha" placeholder="请输入验证码"
+                            class="captchaInput Tinput" required>
+                        <div :class="handleFetchCalss" @click="handleFetch">点击获取验证码</div>
+                        <div :class="secondsClass">请稍后发送:{{ time }}</div>
                     </div>
                     <button type="button" class="btn" @click="handleJoin">点击注册</button>
                 </div>
@@ -34,7 +37,7 @@
                         </button>
                     </div>
                     <div class="overlay-panel over-right">
-                        <button class="btn" id="signUp" @click="signUp">没有账号,点击登陆
+                        <button class="btn" id="signUp" @click="signUp">没有账号,点击注册
                         </button>
                     </div>
                 </div>
@@ -52,30 +55,68 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus'
 import router from '@/router';
 import { useStore } from 'vuex';
+
 const store = useStore()
+let handleFetchCalss = ref('handleFetch')
+let secondsClass = ref('seconds return-true')
 let userForm = ref({})
 let container = ref('container')
+let userRegister = ref({
+    email: '',
+    password: '',
+    username: '',
+    captcha: ''
+})
+let time = ref(60)
+const ChangeTime = () => {
+    handleFetchCalss.value = 'handleFetch return-true'
+    secondsClass.value = 'seconds'
+    let sec = 60
+    const secTime = setInterval(function () {
+        // console.log(sec--);
+        sec--
+        time.value = sec
+        if (sec <= 1) {
+            clearInterval(secTime);
+            handleFetchCalss.value = 'handleFetch'
+            secondsClass.value = 'seconds return-true'
+        }
+    }, 1000);
+}
+const handleFetch = async () => {
+    // console.log(userRegister.value.email)
+    const re = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+    if (re.test(userRegister.value.email)) {
+        let res = await axios.post("/froumApi/froum/captchaSend", userRegister.value)
 
-
+        if (res.data.ok) {
+            ChangeTime()
+        }
+    } else {
+        ElMessage({
+            message: '请输入正确的邮箱格式',
+            type: 'warning',
+        })
+    }
+}
 
 const handleLogin = () => {
     if (userForm.value.username && userForm.value.password) {
-        
-        axios.post('/adminApi/user/login',userForm).then(res=>{
-            console.log(res.data)
-            if(res.data.ok){
-                store.commit("changeIsAddRouter",false)
+
+        axios.post('/froumApi/froum/login',userForm.value).then(res => {
+            
+            if (res.data.ok) {
                 store.commit("changeUserFormInfo",res.data.data)
                 ElMessage.success('登录成功')
                 router.push("/home")
-            }else{
+            } else {
                 ElMessage({
-                    message:"用户名密码不匹配",
-                    type:"error"
+                    message: "用户名密码不匹配",
+                    type: "error"
                 })
             }
         })
-        console.log(userForm.value)
+      
     } else if (userForm.value.username && !userForm.value.password) {
         ElMessage({
             message: '请输入密码',
@@ -94,22 +135,60 @@ const handleLogin = () => {
     }
 }
 
-const handleJoin = () => {
-    if (userForm.value.username && userForm.value.password && userForm.value.email) {
+const handleJoin = async () => {
+    if (userRegister.value.username.length <= 16 && userRegister.value.username && userRegister.value.password.length >= 8 && userRegister.value.password.length <= 24 && userRegister.value.email && userRegister.value.captcha) {
+        const re = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+        if (re.test(userRegister.value.email)) {
+            let res = await axios.post(`/froumApi/froum/register`, userRegister.value)
+            if (res.data.ok) {
+                console.log(res.data)
+                signIn()    
+                ElMessage({
+                    message: `注册成功！`,
+                    type: 'success',
+                })
+            } else {
+                // console.log(res.data.error)
+                ElMessage({
+                    message: `${res.data.error}`,
+                    type: 'warning',
+                })
+            }
+        }else{
+            ElMessage({
+                    message:`邮箱格式错误`,
+                    type: 'warning',
+                })
+        }
 
-    } else if (!userForm.value.email) {
+    } else if (!userRegister.value.email) {
         ElMessage({
             message: '请输入邮箱',
             type: 'warning',
         })
-    }else if(!userForm.value.username){
+    } else if (!userRegister.value.username) {
         ElMessage({
             message: '请输入用户名',
             type: 'warning',
-        }) 
-    }else if(!userForm.value.password){
+        })
+    } else if (userRegister.value.password.length <= 8) {
         ElMessage({
-            message: '请输入密码',
+            message: '密码不得小于8位',
+            type: 'warning',
+        })
+    } else if(userRegister.value.password.length > 24){
+        ElMessage({
+            message: '密码不得大于24位',
+            type: 'warning',
+        })
+    }else if(userRegister.value.username.length >16){
+        ElMessage({
+            message: '用户名不得大于16位',
+            type: 'warning',
+        })
+    } else if (!userRegister.value.captcha) {
+        ElMessage({
+            message: '请输入验证码',
             type: 'warning',
         })
     }
@@ -147,6 +226,42 @@ const signUp = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.seconds {
+
+    text-align: center;
+    margin-left: 4px;
+    line-height: 60px;
+    color: rgb(246, 149, 166);
+    /* background-color: aquamarine; */
+    /* display: none; */
+    padding: 0.9rem 0;
+    line-height: 100%;
+    cursor: pointer;
+
+}
+
+.captchaInput {
+    flex: 3;
+}
+
+.get-captcha {
+    width: 100%;
+    display: flex;
+}
+
+.return-true {
+    display: none;
+}
+
+.handleFetch {
+    margin-left: 4px;
+    line-height: 60px;
+    /* background-color: aliceblue; */
+    color: rgb(246, 149, 166);
+    cursor: pointer;
+    /* display: none; */
 }
 
 .container {
@@ -213,9 +328,10 @@ const signUp = () => {
     margin: 0.5rem 0;
     border: none;
     outline: none;
-    border-radius:5px ;
+    border-radius: 5px;
     /*轮廓线*/
 }
+
 .Tinput {
     width: 100%;
     background-color: #fff;
@@ -224,7 +340,7 @@ const signUp = () => {
 
     border: none;
     outline: none;
-    border-radius:5px ;
+    border-radius: 5px;
 }
 
 .btn {

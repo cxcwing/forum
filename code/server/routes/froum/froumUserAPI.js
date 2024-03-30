@@ -1,6 +1,6 @@
 var express = require("express");   
 var FroumUserRouter = express.Router();
-var FroumViewController = require('../../controllers/froum/froumController')
+var FroumController = require('../../controllers/froum/froumController')
 const multer  = require('multer')
 let fs = require('fs');
 let createFolder = function(folder) {
@@ -24,5 +24,7 @@ let createFolder = function(folder) {
   })
  
 let upload = multer({ storage: storage })
+
+
 
 module.exports = FroumUserRouter

@@ -5,14 +5,14 @@ const sqlPool = mysql.createPool({
     port: 3306,
     user: "cunxicao",
     password: '52cunxicao.',
-    database: 'froum', 
+    database: 'froum',
     connectionLimit: 1
 }).promise()
 
 
-async function test(_id,dingzhen){
+async function test(_id, dingzhen) {
     // let data = await sqlPool.query(`select * from user where _id = ?`,[_id])
-    await sqlPool.query(`update user set username = ? where _id = ?`,[dingzhen,_id])
+    await sqlPool.query(`update user set username = ? where _id = ?`, [dingzhen, _id])
     // return data
 }
 async function login(username, password) {
@@ -23,30 +23,30 @@ async function upload(_id, email, username, gender, introduction, avatar) {
     if (avatar != '') {
         await sqlPool.query(`update user set username=?,gender=?,introduction=?,avatar=?,email=? where _id = ?`, [username, gender, introduction, avatar, email, _id])
     } else {
-        await sqlPool.query(`update user set username=?,gender=?,introduction=?,email=?where _id = ?`, [username, gender, introduction, avatar,email, _id])
+        await sqlPool.query(`update user set username=?,gender=?,introduction=?,email=?where _id = ?`, [username, gender, introduction, avatar, email, _id])
     }
     return 'ok'
 }
 
-async function getList(){
+async function getList() {
     let data = await sqlPool.query(`select * from users`)
     return data
 }
 
-async function toUserUpdate(_id,username,password,email,gender,introduction,vip,role,avatar){
-    if(avatar!=''){
-        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=?,avatar=? where _id=?`,[username,password,email,gender,introduction,vip,role,avatar,_id])
-    }else{
-        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=? where _id=?`,[username,password,email,gender,introduction,vip,role,_id])
+async function toUserUpdate(_id, username, password, email, gender, introduction, vip, role, avatar) {
+    if (avatar != '') {
+        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=?,avatar=? where _id=?`, [username, password, email, gender, introduction, vip, role, avatar, _id])
+    } else {
+        await sqlPool.query(`update users set username=?,password=?,email=?,gender=?,introduction=?,vip=?,role=? where _id=?`, [username, password, email, gender, introduction, vip, role, _id])
     }
 }
 
-async function toUserADD(username,password,email,gender,introduction,avatar){
-    await sqlPool.query('INSERT INTO `users`(`username`, `password`,`email`,`gender`,`introduction`,`avatar`) VALUES (?,?,?,?,?,?)',[username,password,email,gender,introduction,avatar])
+async function toUserADD(username, password, email, gender, introduction, avatar) {
+    await sqlPool.query('INSERT INTO `users`(`username`, `password`,`email`,`gender`,`introduction`,`avatar`) VALUES (?,?,?,?,?,?)', [username, password, email, gender, introduction, avatar])
 }
 
-async function toUserDelete(_id){
-    await sqlPool.query(`delete from users where _id = ?`,[_id])
+async function toUserDelete(_id) {
+    await sqlPool.query(`delete from users where _id = ?`, [_id])
 }
 
 
@@ -57,11 +57,12 @@ const UserController = {
         let { username, password } = req.body._value
         // console.log(username, password)
         // console.log(_id)
-        let user = await login(username, password)  
+        let user = await login(username, password)
         // console.log(user[0][0])
-        let data = user[0][0]
-        delete data.password
+
         if (user[0].length) {
+            let data = user[0][0]
+            delete data.password
             let _id = user[0][0]._id
             const token = JWT.create({ username, _id }, '1d')
             res.header("Authorization", token)
@@ -77,9 +78,9 @@ const UserController = {
             })
         }
     },
-    home:(req,res)=>{
+    home: (req, res) => {
         res.send({
-            ok:1
+            ok: 1
         })
     },
     Update: async (req, res) => {
@@ -87,10 +88,10 @@ const UserController = {
         let { _id } = token
         // console.log(_id)
         let { username, email, gender, introduction } = req.body
-        
+
         let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ""
         // console.log(avatar)
-        await upload(_id,email,username,gender,introduction,avatar)
+        await upload(_id, email, username, gender, introduction, avatar)
         // let data = await test(_id,'寸夕屮')
         // console.log(data)
         // console.log(_id,token)
@@ -121,29 +122,29 @@ const UserController = {
         }
     },
 
-    getUserList:async(req,res)=>{
+    getUserList: async (req, res) => {
         // console.log(req.body)
         let list = await getList()
         // console.log(list[0])
         res.send({
-            ok:1,
-            data:list[0]
+            ok: 1,
+            data: list[0]
         })
     },
-    userUpdate:async(req,res)=>{
+    userUpdate: async (req, res) => {
         // console.log(req.body)
-        let {_id,username,password,email,gender,introduction,vip,role} = req.body
+        let { _id, username, password, email, gender, introduction, vip, role } = req.body
         // console.log(req.file)
         _id = Number(_id)
-        let avatar = req.file?`/${req.file.destination.split('/')[1]}/${req.file.filename}`:''
-        await toUserUpdate(_id,username,password,email,gender,introduction,vip,role,avatar)
+        let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ''
+        await toUserUpdate(_id, username, password, email, gender, introduction, vip, role, avatar)
 
         res.send({
-            ok:1,
-            data:{
+            ok: 1,
+            data: {
                 _id,
                 username,
-                password, 
+                password,
                 email,
                 gender,
                 introduction,
@@ -153,7 +154,7 @@ const UserController = {
             }
         })
     },
-    userDelete:async (req,res)=>{
+    userDelete: async (req, res) => {
         // console.log(req.body)
         let _id = Number(req.query._id)
         // console.log(req.query)
@@ -161,25 +162,25 @@ const UserController = {
         await toUserDelete(_id)
 
         res.send({
-            ok:1,
+            ok: 1,
 
         })
-    }, 
-    userAdd:async (req,res)=>{
+    },
+    userAdd: async (req, res) => {
         // console.log(req.body)
-        let {username,password,email,gender,introduction} = req.body
+        let { username, password, email, gender, introduction } = req.body
         let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
-        await toUserADD(username,password,email,gender,introduction,avatar)
+        await toUserADD(username, password, email, gender, introduction, avatar)
         res.send({
-            ok:1,
+            ok: 1,
         })
     },
-    imageAdd:(req,res)=>{
+    imageAdd: (req, res) => {
         // console.log('aaaa')
         // console.log(req.file)
         let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
         res.send({
-            "url": `http://localhost:3000/${avatar}`  
+            "url": `http://localhost:3000/${avatar}`
         })
     }
 

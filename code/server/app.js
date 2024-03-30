@@ -9,6 +9,8 @@ const cors = require('cors');
 var userApi = require('./routes/admin/userAPI.js');
 var taleApi = require('./routes/admin/taleAPI.js');
 var postApi = require('./routes/admin/postAPI.js');
+var froumUserApi = require('./routes/froum/froumUserAPI.js')
+var froumViewApi = require('./routes/froum/froumViewAPI.js')
 const JWT = require('./util/JWT.js');
 
 var app = express();
@@ -26,6 +28,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', indexRouter);
 
 // app.use('/users', usersRouter);
+
+app.use(froumViewApi)
 
 app.use((req,res,next)=>{
   if(req.url === '/adminApi/user/login'){//排除登陆接口
@@ -45,6 +49,7 @@ app.use((req,res,next)=>{
       },"1d")
       res.header("authorization",newToken)
       next()
+
     }else{
       res.status(401).send({errCode:-1,errInfo:"身份验证过期"})
     }
@@ -53,7 +58,7 @@ app.use((req,res,next)=>{
      
   }
 })
-
+app.use(froumUserApi)
 
 app.use(userApi)
 app.use(taleApi)
