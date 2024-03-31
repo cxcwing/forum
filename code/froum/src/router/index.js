@@ -28,6 +28,7 @@ const routes = [
       {
         path:'/tale',
         name:'tale',
+  
         component:tale
       }
     ]

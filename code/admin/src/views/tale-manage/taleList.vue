@@ -30,13 +30,22 @@
             <el-table-column label="类型" width="100">
                 <template #default="scope">
                     <div v-if="scope.row.type === 0">
-                        <span>自创故事</span>
-                    </div>
-                    <div v-else-if="scope.row.gender === 1">
                         <span>非恐怖</span>
                     </div>
-                    <div v-else-if="scope.row.gender === 2">
+                    <div v-else-if="scope.row.type === 1">
+                        <span>自创故事</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 2">
                         <span>据事实改编</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 3">
+                        <span>我有一个朋友</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 4">
+                        <span>搬运</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 5">
+                        <span>我听说</span>
                     </div>
                     <div v-else>
                         <span>恐怖</span>

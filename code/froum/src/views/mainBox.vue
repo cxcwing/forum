@@ -1,5 +1,5 @@
 <template>
-  <div class="mainBox">
+  <div @scroll="mainBoxScroll" class="mainBox">
         <navbar>
     
         </navbar>   

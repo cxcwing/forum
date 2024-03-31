@@ -79,3 +79,14 @@ img {
     float: right;
     margin-left: var(--ck-image-style-spacing);
 }
+
+{
+  0:非恐怖，
+  1：自创
+  2：根据事实改编
+  3：我有一个朋友
+  4：搬运
+  5：我听说
+  6：恐怖
+
+}

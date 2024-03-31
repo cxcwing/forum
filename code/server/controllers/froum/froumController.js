@@ -42,6 +42,7 @@ const sqlPool = mysql.createPool({
     database: 'froum',
     connectionLimit: 1
 }).promise()
+
 const transporter = nodemailer.createTransport(mailerConfig)
 async function saveCaptcha(idCode,createtime,email){
     console.log(createtime)
@@ -68,7 +69,16 @@ async function toLogin(username,password){
     let data =await sqlPool.query(`select * from users where username=? and password=?`,[username,password])
     return data[0]
 }
-
+async function toGetTaleList(id){
+    if(id === 0){
+        //除了id = 6
+        let data = await sqlPool.query(`select * from tale where id!=?`,[id])
+        return data[0]
+    }else{
+        let data = await sqlPool.query(`select * from tale where id=?`,[id])
+        return data[0]
+    }
+}
 
 
 const froumController = {
@@ -174,6 +184,53 @@ const froumController = {
             })
         }
      
+    },
+    getTaleList:async (req,res)=>{
+        console.log(req.query)
+        let id = parseInt(req.query.id)
+        let {num,page,Hsort} = req.query
+         num = parseInt(num)
+         page = parseInt(page)
+         Hsort = parseInt(Hsort)
+         let searchRes = await toGetTaleList(id)
+   
+        
+        let end = num * page
+        let begin = end - num 
+
+        if(searchRes.length && begin <= searchRes.length){
+            // console.log(data)
+          
+            if(Hsort === 0){
+                searchRes.sort((a,b)=> parseInt(b.lookNumber)-parseInt(a.lookNumber))
+    
+            }else if(Hsort === 1)
+            {
+                searchRes.sort( (a,b)=>{
+                    return new Date(b.time) - new Date(a.time) 
+                }) 
+        
+            }
+   
+            if(end > searchRes.length && end - num < searchRes.length) 
+            {
+                end = searchRes.length
+            }
+            
+             let data = searchRes.slice(begin,end)
+
+            res.send({
+                ok:1,
+                data
+            })
+        }else{
+            // console.log('wu')
+            res.send({
+                ok:0,
+                error:'暂无数据'
+            })
+        }
+   
     }
 }
 

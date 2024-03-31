@@ -1,3 +1,5 @@
+const { type } = require("os")
+
 let user = {
     id:1,
     username:'名称',
@@ -65,3 +67,4 @@ let Comment = {
     time:'',
 
 }
+

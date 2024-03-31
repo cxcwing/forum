@@ -25,10 +25,13 @@
 
                 <el-form-item :size="'large'" label="类型" prop="gender">
                     <el-select style="width: 200px;" v-model="taleForm.type" placeholder="选择类型" class="sel">
-                        <el-option label="自创故事" :value="0 "/>
-                        <el-option label="非恐怖" :value="1" />
+                        <el-option label="非恐怖" :value="0" />
+                        <el-option label="自创故事" :value="1"/>
                         <el-option label="据事实改编" :value="2" />
-                        <el-option label="恐怖" :value="3" />
+                        <el-option label="我有一个朋友" :value="3" />
+                        <el-option label="搬运" :value="4" />
+                        <el-option label="我听说" :value="5" />
+                        <el-option label="恐怖" :value="6" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="封面" prop="cover">

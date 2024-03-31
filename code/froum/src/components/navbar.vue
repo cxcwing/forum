@@ -330,6 +330,7 @@ onMounted(()=>{
     width: 100%;
     background-color: white;
     top:0;
+    z-index: 1000;
     /* display: grid; */
     /* grid-template-columns: 1fr 1fr; */
 }

@@ -31,7 +31,7 @@ module.exports = defineConfig({
       .use('raw-loader')
       .loader('raw-loader');
 
-    // (2.) Transpile the .css files imported by the editor using PostCSS.
+    // (2.) Transpile the .css f//cunxicaoiles imported by the editor using PostCSS.
     // Make sure only the CSS belonging to ckeditor5-* packages is processed this way.
     config.module
       .rule('cke-css')
