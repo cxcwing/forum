@@ -58,8 +58,8 @@
 
                 </div>
             </div>
-            <ul v-infinite-scroll="load" infinite-scroll-immediate="false" class="infinite-list"
-                infinite-scroll-delay="5000" :infinite-scroll-distance="10" style="overflow: auto">
+            <ul class="infinite-list" infinite-scroll-delay="5000" :infinite-scroll-distance="10"
+                style="overflow: auto">
                 <li v-for="item in taleList" :key="item.id" class="infinite-list-item list-item">
                     <div class="border-bottom">
                         <div class='content-item'>
@@ -71,8 +71,20 @@
                             </div>
                             <div class="good">
                                 <div class="head">
-                                    <span class="goodFirst">{{ item.author }}</span>
-
+                                    <div class="goodFirst">{{ item.author }}</div>
+                                    <div class="eyseBox">
+                                        <el-icon class="eyse">
+                                            <View />
+                                        </el-icon> {{ item.lookNumber }}
+                                    </div>
+                                    
+                                    <div  @click="handleLike" class="likeBox" :data-id="item.id">
+                                        
+                                        <el-icon class="like">
+                                            <MagicStick />
+                                        </el-icon>
+                                       {{ item.lookNumber }}
+                                    </div>
                                 </div>
                                 <div class="body">
 
@@ -94,18 +106,56 @@
                 </li>
             </ul>
         </div>
-        <div class="right">3</div>
+        <div class="right">
+            <div class="rightOne">
+                <div class="rightWord">
+                    <span class="rightTime">{{ whatTime }}</span>
+                    <div class="rightToke">今天我来过！</div>
+                </div>
+                <div v-if="!isMark" @click="handleMarck" class="rightMark">
+                    点击签到
+                </div>
+                <div v-else class="rightMark">已签到</div>
+            </div>
+            <div class="rightTwo">作品榜</div>
+
+        </div>
     </div>
 </template>
 <script setup>
 import { Grid, Ship, Link, Bicycle, Pear, Headset, Warning } from '@element-plus/icons-vue'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, h } from 'vue'
+import { useStore } from 'vuex';
 import axios from 'axios'
+import { ElNotification } from 'element-plus'
+import {MagicStick,View } from '@element-plus/icons-vue'
+
+const store = useStore()
 const taleList = ref([])
 const selectWhich = ref(0)
 const howSort = ref(0)
 const isDisabled = ref(false)
+const isMark = ref(false)
+const whatTime = ref('贵安！')
 let count = 1
+const handleLike =async (evt)=>{
+    console.log(evt.currentTarget.dataset)
+    let res = await axios.get(`/froumApi/froum/like?id=${evt.currentTarget.dataset.id}`)
+}
+const handleMarck = async () => {
+    let res = await axios.get(`/froumApi/froum/marck?id=${store.state.userFormInfo._id}`)
+    if (res.data.ok) {
+        isMark.value = true
+        ElNotification({
+            title: '签到成功',
+            message: h('i', { style: 'color: teal' }, '能量加10,power!!!'),
+        })
+        store.commit("changeUserFormInfo", res.data.data)
+
+    } else {
+        console.log('签到出错')
+    }
+}
 
 const contentValue = (content) => {
     let rm = /<(\w+)(?:\s+[^>]+)?>|<\/\w+>/g
@@ -175,10 +225,20 @@ const handleScroll = async () => {
     }
 }
 onMounted(async () => {
+
+    let userMarckTime = new Date(store.state.userFormInfo.marckTime)
+    let nowTime = new Date()
+    console.log()
+    if (userMarckTime.getDay() != nowTime.getDay()) {
+        isMark.value = false
+    } else {
+        isMark.value = true
+    }
     window.addEventListener('scroll', handleScroll);
     let res = await getList(selectWhich.value, 6, count, howSort.value)
     if (res.data.ok) {
         taleList.value = res.data.data
+
     } else {
         taleList.value = []
     }
@@ -192,6 +252,44 @@ onUnmounted(() => {
 
 </script>
 <style scoped>
+.el-icon.eyse {
+    padding-right: 0;
+    margin: 0;
+    margin-top: 2px;
+    margin-right: 5px;
+}
+
+.eyseBox {
+    height: 16px;
+    line-height: 16px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    margin-right:20px;
+}
+.el-icon[data-v-76f4c0c0]{
+    padding:0;
+}
+
+.likeBox {
+    height: 16px;
+    line-height: 16px;
+    font-size:13px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+}
+.like{
+    padding:0;
+    margin:2px;
+    font-size:16px;
+
+}
+
+.likeBox:hover{
+    color: rgb(24, 220, 2);
+}
 .sortBox {
     border-bottom: #8a919f4a 1px solid;
     padding: 12px;
@@ -268,9 +366,26 @@ onUnmounted(() => {
     white-space: nowrap;
 }
 
+.head {
+    display: flex;
+    flex-direction: row;
+}
+
 .goodFirst {
     padding-right: 5px;
     position: relative;
+    margin-right: 8px;
+}
+
+.goodFirst::before {
+    content: '';
+    width: 2px;
+    height: 12px;
+    /* background-color: #0055ff; */
+    position: absolute;
+    right: -2px;
+    top: 3px;
+    border-right: 1px #8a919f76 solid;
 }
 
 .good {
@@ -278,6 +393,8 @@ onUnmounted(() => {
     font-size: 13px;
     color: #8A919F;
     display: flex;
+    /* height: 10px; */
+
 }
 
 .image {
@@ -301,9 +418,11 @@ onUnmounted(() => {
     padding-right: 20px;
     cursor: pointer;
 }
-.list-item:hover{
+
+.list-item:hover {
     background-color: #8a919f0c;
 }
+
 .content-item {
     display: flex;
     flex-direction: column;
@@ -326,7 +445,7 @@ onUnmounted(() => {
 
 .mainBox {
     display: flex;
-    width: 85%;
+    width: 82%;
     margin: 0 auto;
     margin-top: 1.2%;
     /* overflow: hidden; */
@@ -355,9 +474,65 @@ onUnmounted(() => {
 }
 
 .right {
-    flex: 5;
-    background-color: burlywood;
+    flex: 4;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    /* justify-items: center; */
+    /* text-align: center; */
+}
 
+.rightWord {
+    margin-right: 60px;
+}
+
+.rightOne {
+    /* height:100px; */
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    /* padding-right: 10px; */
+    border-radius: 8px;
+    display: flex;
+}
+
+.rightTime {
+    font-size: 16px;
+    font-weight: 600;
+
+}
+
+.rightToke {
+    font-size: 13px;
+    color: #8A919F;
+    margin-top: 10px;
+}
+
+.rightTwo {
+    height: 100px;
+    background-color: white;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+}
+
+.rightMark {
+    margin-top: 10px;
+    background-color: rgba(135, 248, 137, 0.148);
+    border-radius: 5px;
+    color: rgb(24, 220, 0);
+    border: 1px rgba(26, 220, 0, 0.721) solid;
+    text-align: center;
+    font-size: 15px;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 12px;
+    min-width: 60px;
+    /* height: 60px; */
+    /* line-height: 60px; */
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .first>span {

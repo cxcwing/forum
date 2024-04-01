@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const cors = require('cors');  
+const cors = require('cors');
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 var userApi = require('./routes/admin/userAPI.js');
@@ -31,32 +31,40 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(froumViewApi)
 
-app.use((req,res,next)=>{
-  if(req.url === '/adminApi/user/login'){//排除登陆接口
+app.use((req, res, next) => {
+
+  if (req.url === '/adminApi/user/login') {//排除登陆接口
     next()
     return
-  } 
-  const token = req.headers["authorization"].split(' ')[1]
-  // console.log(token)
-  if(token){
-    let payload = JWT.verify(token) 
-    // console.log(payload,11)
-    if(payload){
-      // console.log('111111111111111111')
-      const newToken = JWT.create({
-        _id:payload._id,
-        username:payload.username
-      },"1d")
-      res.header("authorization",newToken)
-      next()
-
-    }else{
-      res.status(401).send({errCode:-1,errInfo:"身份验证过期"})
-    }
- 
-  }else{
-     
   }
+
+  if (req.headers["authorization"]) {
+    const token = req.headers["authorization"].split(' ')[1]
+    if (token) {
+      let payload = JWT.verify(token)
+      // console.log(payload,11)
+      if (payload) {
+        // console.log('111111111111111111')
+        const newToken = JWT.create({
+          _id: payload._id,
+          username: payload.username
+        }, "30d")
+        res.header("authorization", newToken)
+        next()
+
+      } else {
+        res.status(401).send({ errCode: -1, errInfo: "身份验证过期" })
+      }
+
+    } else {
+
+    }
+  }else{
+
+    res.status(401).send({ errCode: -2, errInfo: "验证失败" })
+  }
+
+
 })
 app.use(froumUserApi)
 
@@ -64,12 +72,12 @@ app.use(userApi)
 app.use(taleApi)
 app.use(postApi)
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

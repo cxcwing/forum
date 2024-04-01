@@ -79,6 +79,12 @@ async function toGetTaleList(id){
         return data[0]
     }
 }
+async function toMarck(_id,marckTime){
+    await sqlPool.query(`update users set power = power + 10 where _id=?`,[_id])
+    await sqlPool.query(`update users set marckTime=? where _id=?`,[marckTime,_id])
+    let data = await sqlPool.query(`select * from users where _id = ?`,[_id])
+    return data
+}
 
 
 const froumController = {
@@ -231,6 +237,26 @@ const froumController = {
             })
         }
    
+    },
+    marck:async (req,res)=>{
+        console.log(req.query)
+        let _id  = parseInt(req.query.id)
+        let marckTime = new Date()
+        
+        let data = await toMarck(_id,marckTime.getTime())
+     
+        res.send({
+            ok:1,
+            data:data[0][0]
+        })
+
+    },
+    like:async(req,res)=>{
+        console.log(req.query.id)
+        // await toLike()
+        res.send({
+            ok:1,
+        })
     }
 }
 

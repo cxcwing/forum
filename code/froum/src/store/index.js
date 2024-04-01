@@ -11,13 +11,17 @@ export default createStore({
   mutations: {
     changeMassageIsShow(state,isShow){
       state.massageIsShow = isShow
-      console.log(isShow)
+      
     },
     changeUserFormInfo(state,userForm){
       state.userFormInfo={
         ...state.userFormInfo,
         ...userForm
       }
+
+    },
+    changeUserMarckTime(state,marckTime){
+      state.userFormInfo.marckTime = marckTime
     }
   },
   actions: {

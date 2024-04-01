@@ -35,7 +35,7 @@ const routes = [
   },
   {
     path:'/',
-    redirect:'/home'
+    redirect:'/tale'
   }
 
 

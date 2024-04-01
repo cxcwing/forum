@@ -4,9 +4,9 @@
             <div class="container-form container-signup">
                 <div action="#" class="form" id="form1">
                     <h2 class="form-title">注册账号</h2>
-                    <input type="email" v-model="userRegister.email" placeholder="email" class="Tinput" required>
-                    <input type="text" v-model="userRegister.username" placeholder="username" class="Tinput" required>
-                    <input type="password" v-model="userRegister.password" placeholder="password" class="Tinput"
+                    <input type="email" v-model="userRegister.email" placeholder="请输入邮箱" class="Tinput" required>
+                    <input type="text" v-model="userRegister.username" placeholder="用户名" class="Tinput" required>
+                    <input type="password" v-model="userRegister.password" placeholder="密码" class="Tinput"
                         required>
                     <div class="get-captcha">
                         <input type="text" v-model="userRegister.captcha" placeholder="请输入验证码"
@@ -22,8 +22,8 @@
                 <div action="#" class="form" id="form2">
                     <h2 class="form-title">欢迎登陆</h2>
 
-                    <input type="text" v-model="userForm.username" placeholder="username" class="input" required>
-                    <input type="password" v-model="userForm.password" placeholder="password" class="input " required>
+                    <input type="text" v-model="userForm.username" placeholder="用户名" class="input" required>
+                    <input type="password" v-model="userForm.password" placeholder="密码" class="input " required>
                     <a href="#" class="link">忘记密码</a>
                     <button type="button" class="btn" @click="handleLogin">登陆</button>
                 </div>
@@ -108,7 +108,7 @@ const handleLogin = () => {
             if (res.data.ok) {
                 store.commit("changeUserFormInfo",res.data.data)
                 ElMessage.success('登录成功')
-                router.push("/home")
+                router.push("/tale")
             } else {
                 ElMessage({
                     message: "用户名密码不匹配",

@@ -22,9 +22,10 @@ let createFolder = function(folder) {
       // cb(null, Date.now() + '-' + file.originalname) // 加上Date.now()可以避免命名重复
     }
   })
+ let upload = multer({ storage: storage })
  
-let upload = multer({ storage: storage })
-
-
+ FroumUserRouter.get("/froumApi/froum/marck",FroumController.marck)
+ FroumUserRouter.get("/froumApi/froum/like",FroumController.like)
+ 
 
 module.exports = FroumUserRouter

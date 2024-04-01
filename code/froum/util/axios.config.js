@@ -25,8 +25,11 @@ axios.interceptors.response.use(function (response) {
     }  
     return response;
   }, function (error) { //如果出现错误401 
+    
     const {status} = error.response
+    
     if(status===401){
+      console.log(error.response.data)
       localStorage.removeItem("Ctoken")
     }
     return Promise.reject(error);

@@ -88,6 +88,7 @@
 import { ref,onMounted,computed } from 'vue'
 import { Search, EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
 import { useStore } from 'vuex';
+import axios from 'axios';
 const store = useStore()
 const activeIndex = ref('/tale')
 const userForm = ref({})
@@ -117,7 +118,7 @@ const howCollection = computed(()=>{
         return userForm.value.collection.length
     }
 })
-onMounted(()=>{
+onMounted(async ()=>{
     // console.log(window.location.href)
 
    let arr1 = window.location.href.split('/')
