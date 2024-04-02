@@ -77,13 +77,13 @@
                                             <View />
                                         </el-icon> {{ item.lookNumber }}
                                     </div>
-                                    
-                                    <div  @click="handleLike" class="likeBox" :data-id="item.id">
-                                        
-                                        <el-icon class="like">
+
+                                    <div @click="handleLike(item)" :class="`likeBox  ${ifLike(item) ? 'beLiked' : ''}`" :data-id="item.id">
+
+                                        <el-icon :class="`like`">
                                             <MagicStick />
                                         </el-icon>
-                                       {{ item.lookNumber }}
+                                        {{ item.goodNumber }}
                                     </div>
                                 </div>
                                 <div class="body">
@@ -127,8 +127,9 @@ import { Grid, Ship, Link, Bicycle, Pear, Headset, Warning } from '@element-plus
 import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { useStore } from 'vuex';
 import axios from 'axios'
-import { ElNotification } from 'element-plus'
-import {MagicStick,View } from '@element-plus/icons-vue'
+import { ElMessage, ElNotification, componentSizeMap, ElMessageBox } from 'element-plus'
+import { MagicStick, View } from '@element-plus/icons-vue'
+import { timePanelSharedProps } from 'element-plus/es/components/time-picker/src/props/shared';
 
 const store = useStore()
 const taleList = ref([])
@@ -137,10 +138,126 @@ const howSort = ref(0)
 const isDisabled = ref(false)
 const isMark = ref(false)
 const whatTime = ref('贵安！')
+
 let count = 1
-const handleLike =async (evt)=>{
-    console.log(evt.currentTarget.dataset)
-    let res = await axios.get(`/froumApi/froum/like?id=${evt.currentTarget.dataset.id}`)
+//有没有人点过赞 
+const ifLike= (item)=>{
+    if(store.state.userFormInfo.toGood && store.state.userFormInfo.toGood.indexOf(item.id) != -1){
+            return true
+    }else{
+        return false
+    }
+}
+
+const likeList = (item, id) => {
+
+    let likeArr = []
+    if (item) {
+        console.log(JSON.parse(item), JSON.parse(item).length)
+        likeArr = JSON.parse(item)
+        likeArr.push(id)
+    } else {
+
+
+        likeArr.push(id)
+    }
+    return likeArr
+}
+
+const handleLike = async (item) => {
+
+
+    // console.log(store.state.userFormInfo.toGood,"55555555555555")
+    // console.log(Object.values(null),';aaaaaaaaa')
+    //1.点赞不为0 且点赞列表没有该作品 // 操作
+    //2.不为零，有该作品 // 点过不作为
+    //3.点赞为0 // 操作
+    // console.log(store.state.userFormInfo.toGood,'aaaaaaaaaaaaa')
+
+    if (store.state.userFormInfo._id) {
+        if (store.state.userFormInfo.toGood) {
+            console.log()
+            if (store.state.userFormInfo.toGood.indexOf(item.id) != -1) {
+
+            } else {
+                //没有
+                store.state.userFormInfo.toGood.indexOf(item.id)
+
+                let userGood = store.state.userFormInfo.toGood
+                userGood.push(item.id)
+                let likeArr = likeList(item.whoGood, store.state.userFormInfo._id)
+
+                let form = {
+                    likeArr: JSON.stringify(likeArr),
+                    userGood: JSON.stringify(userGood),
+                    taleId: item.id,
+                    userId: store.state.userFormInfo._id
+                }
+
+                axios.post(`/froumApi/froum/like`, form).then(res => {
+                    if (res.data.ok) {
+                        store.commit("changeUserFormInfo", res.data.data)
+                        console.log('1111111')
+                    }
+                    item.goodNumber++
+                    console.log('1111111')
+                }).catch(eror => {
+                    ElMessage({
+                        showClose: true,
+                        message: '登陆后才能点赞哦',
+                        type: 'warning',
+                    })
+
+                })
+            }
+        } else {
+
+            let userGood = []
+            console.log('aaaaaaaaaaaaaaaa')
+            let likeArr = likeList(item.whoGood, store.state.userFormInfo._id)
+            let form = {
+                likeArr: JSON.stringify(likeArr),
+                userGood: JSON.stringify(userGood),
+                taleId: item.id,
+                userId: store.state.userFormInfo._id
+            }
+            axios.post(`/froumApi/froum/like`, form).then(res => {
+                console.log(res.data, res.data.ok)
+                if (res.data.ok) {
+                    console.log('22222222222')
+                    store.commit("changeUserFormInfo", res.data.data)
+                }
+                console.log('22222222222')
+                item.goodNumber++
+                console.log('22222')
+            }).catch(eror => {
+                if (eror.response === 401) {
+                    ElMessage({
+                        showClose: true,
+                        message: '登陆后才能点赞哦',
+                        type: 'warning',
+                    })
+                }
+
+
+            })
+
+
+
+        }
+
+
+    } else {
+        ElMessage({
+            showClose: true,
+            message: '登陆后才能点赞哦',
+            type: 'warning',
+        })
+
+    }
+
+
+
 }
 const handleMarck = async () => {
     let res = await axios.get(`/froumApi/froum/marck?id=${store.state.userFormInfo._id}`)
@@ -164,6 +281,7 @@ const contentValue = (content) => {
     str1 = str1.replace(/&nbsp;/g, '')
     return str1.substring(0, 100)
 }
+
 const getList = async (id, num, page, sort) => {
     let res = await axios.get(`/froumApi/froum/getTaleList?id=${id}&num=${num}&page=${page}&Hsort=${sort}`)
     return res
@@ -213,7 +331,7 @@ const handleScroll = async () => {
 
         let res = await getList(selectWhich.value, 6, count, howSort.value)
         if (res.data.ok) {
-            console.log(res.data.data)
+            // console.log(res.data.data)
             taleList.value = [
                 ...taleList.value,
                 ...res.data.data
@@ -266,30 +384,37 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     justify-items: center;
-    margin-right:20px;
+    margin-right: 20px;
 }
-.el-icon[data-v-76f4c0c0]{
-    padding:0;
+
+.el-icon[data-v-76f4c0c0] {
+    padding: 0;
 }
 
 .likeBox {
     height: 16px;
     line-height: 16px;
-    font-size:13px;
+    font-size: 13px;
     display: flex;
     justify-content: center;
     justify-items: center;
 }
-.like{
-    padding:0;
-    margin:2px;
-    font-size:16px;
+
+.like {
+    padding: 0;
+    margin: 2px;
+    font-size: 16px;
 
 }
 
-.likeBox:hover{
+.likeBox:hover {
     color: rgb(24, 220, 2);
 }
+
+.beLiked {
+    color: rgb(24, 220, 2);
+}
+
 .sortBox {
     border-bottom: #8a919f4a 1px solid;
     padding: 12px;

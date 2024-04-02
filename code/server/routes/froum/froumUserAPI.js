@@ -25,7 +25,7 @@ let createFolder = function(folder) {
  let upload = multer({ storage: storage })
  
  FroumUserRouter.get("/froumApi/froum/marck",FroumController.marck)
- FroumUserRouter.get("/froumApi/froum/like",FroumController.like)
+ FroumUserRouter.post("/froumApi/froum/like",FroumController.like)
  
 
 module.exports = FroumUserRouter

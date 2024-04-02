@@ -19,9 +19,11 @@
                     </el-input>
                 </div>
                 <div class='avatar'>
-                    <el-avatar @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
-                        :src='`http://localhost:3000${userForm.avatar}`'/>
-                    <div @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
+                    <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
+                    :src='`http://localhost:3000${userForm.avatar}`'/>
+                    <el-avatar v-else="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
+                    :src='`http://localhost:3000/images/1711108153245-0.png`'/>
+                    <div v-if="userForm._id" @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
 
                         <span class="username">{{ userForm.username }}</span>
                         <div class="idLevelBox">
@@ -77,7 +79,62 @@
                             </el-icon>
                         </div>
                     </div>
+                    <div v-else="userForm._id" @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
+                        <span class="username">{{ userForm.username }}</span>
+                        <div class="idLevelBox">
+                            <span :class="idLevel">神秘用户</span>
+                            <span>lv?</span>
+                        </div>
+                        <div class="powerBox">
+                            <span class="power">能量 :???</span>
+                        </div>
+                        <div  class="goodBox">
+                            <div class="good">
+                                <p class="goodTop">?</p>
+                                <p class="goodFooter goodFooter">收藏</p>
+                            </div>
+                            <div  class="beGood">
+                                <p class="goodTop">?</p>
+                                <p class="goodFooter beGoodFooter">故事</p>
+                            </div>
+                            <div  class="beShou">
+                                <p class="goodTop">?</p>
+                                <p class="goodFooter beShouFooter">贴子</p>
+                            </div>
+
+                        </div>
+                        <div class="guangGao">广告位招租</div>
+                        <div class="center goToBox">
+                            <el-icon>
+                                <User />
+                            </el-icon>
+                            <span class="goTo">没有个人中心</span>
+                            <el-icon>
+                                <ArrowRight />
+                            </el-icon>
+                        </div>
+                        <div class="conBox goToBox">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span class="goTo">创作管理不了</span>
+
+                            <el-icon>
+                                <ArrowRight />
+                            </el-icon>
+                        </div>
+
+                        <div @click="handleToLogin" class="exit goToBox">
+                            <el-icon><Van /></el-icon>
+                            <span class="goTo">点击登陆</span>
+                            <el-icon>
+                                <ArrowRight />
+                            </el-icon>
+                        </div>
+                    </div>
                 </div>
+
+
             </el-menu>
         </div>
 
@@ -86,7 +143,7 @@
 
 <script setup>
 import { ref,onMounted,computed } from 'vue'
-import { Search, EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
+import { Search,Van,EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
 import { useStore } from 'vuex';
 import axios from 'axios';
 const store = useStore()
@@ -100,6 +157,9 @@ const avatarHover = () => {
     // console.log(1)
     form.value = 'form formHover'
     avatarClass.value = 'one Hover'
+}
+const handleToLogin = ()=>{
+    window.location.href = '/login'
 }
 const mouseOut = () => {
     form.value = 'form'

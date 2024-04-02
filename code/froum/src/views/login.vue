@@ -107,6 +107,7 @@ const handleLogin = () => {
             
             if (res.data.ok) {
                 store.commit("changeUserFormInfo",res.data.data)
+          
                 ElMessage.success('登录成功')
                 router.push("/tale")
             } else {
