@@ -9,7 +9,7 @@ const mailerConfig = {
     secure: true,
     auth: {
         user: 'cunxicao@163.com',
-        pass: ''
+        pass: 'VLHOSBIHMYKMPZIV'
     }
 }
 const maileOption = (email, Captcha) => {
@@ -72,10 +72,10 @@ async function toLogin(username, password) {
 async function toGetTaleList(id) {
     if (id === 0) {
         //除了id = 6
-        let data = await sqlPool.query(`select * from tale where id!=?`, [id])
+        let data = await sqlPool.query(`select * from tale where type!=?`, [6])
         return data[0]
     } else {
-        let data = await sqlPool.query(`select * from tale where id=?`, [id])
+        let data = await sqlPool.query(`select * from tale where type=?`, [id])
         return data[0]
     }
 }
@@ -85,13 +85,20 @@ async function toMarck(_id, marckTime) {
     let data = await sqlPool.query(`select * from users where _id = ?`, [_id])
     return data
 }
-async function toAddLike(likeArr,num,userGood,taleId,userId){
-    await sqlPool.query(`update users set toGood=? where _id=?`,[userGood,userId])
-    await sqlPool.query(`update tale set whoGood=?,goodNumber=? where id=?`,[likeArr,num,taleId])
-    let res = await sqlPool.query(`select * from users where _id=?`,[userId])
+async function toAddLike(likeArr, num, userGood, taleId, userId) {
+    await sqlPool.query(`update users set toGood=? where _id=?`, [userGood, userId])
+    await sqlPool.query(`update tale set whoGood=?,goodNumber=? where id=?`, [likeArr, num, taleId])
+    let res = await sqlPool.query(`select * from users where _id=?`, [userId])
     return res[0]
 }
-
+async function toGetTale(id) {
+    let res = await sqlPool.query(`select * from tale where id=?`, [id])
+    return res[0]
+}
+async function toGetAuthor(id) {
+    let res = await sqlPool.query(`select * from users where _id =?`, [id])
+    return res[0]
+}
 
 const froumController = {
     getPostList: (req, res) => {
@@ -205,7 +212,8 @@ const froumController = {
 
     },
     getTaleList: async (req, res) => {
-        console.log(req.query)
+        // console.log(req.query)
+
         let id = parseInt(req.query.id)
         let { num, page, Hsort } = req.query
         num = parseInt(num)
@@ -254,15 +262,59 @@ const froumController = {
         }
 
     },
-    marck: async (req, res) => {
+
+    getTale: async (req, res) => {
         console.log(req.query)
+        let id = parseInt(req.query.id)
+        let data = await toGetTale(id)
+
+        console.log()
+        if (data.length) {
+            data = data[0]
+            let authorId = data.authorId
+            let authorData = await toGetAuthor(authorId)
+            if (data.whoCollection) {
+                data.whoCollection = JSON.stringify(data.whoCollection)
+            }
+            if (data.whoGood) {
+                data.whoGood = JSON.stringify(data.whoGood)
+            }
+            if (data.Comment) {
+                data.Comment = JSON.stringify(data.Comment)
+            }
+            if (authorData.length) {
+                authorData = authorData[0]
+                delete authorData.password
+                res.send({
+                    ok: 1,
+                    data,
+                    authorData
+                })
+            }
+
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '查无此故事'
+            })
+        }
+
+    },
+
+
+
+
+
+
+    marck: async (req, res) => {
+        // console.log(req.query)
         let _id = parseInt(req.query.id)
         let marckTime = new Date()
 
         let data = await toMarck(_id, marckTime.getTime())
         data = data[0][0]
         delete data.password
-        console.log(data)
+        // console.log(data)
         if (data.toGood) {
             data.toGood = JSON.stringify(data.toGood)
         }
@@ -273,23 +325,26 @@ const froumController = {
 
     },
     like: async (req, res) => {
-        let {likeArr,userGood,taleId,userId} = req.body
+        let { likeArr, userGood, taleId, userId } = req.body
         // console.log(likeArr,userGood,taleId,userId)
         let num = JSON.parse(likeArr).length
-       
-        let searchRes = await toAddLike(likeArr,num,userGood,taleId,userId)
-        if(searchRes.length){
+        console.log(likeArr, userGood, taleId, userId)
+        let searchRes = await toAddLike(likeArr, num, userGood, taleId, userId)
+        if (searchRes.length) {
             let data = searchRes[0]
             delete data.password
-            data.toGood = JSON.stringify(data.toGood)
+            if (data.toGood) {
+                data.toGood = JSON.stringify(data.toGood)
+            }
+
             res.send({
                 ok: 1,
                 data
             })
-        }else{
+        } else {
             res.send({
-                ok:0,
-                errorInfo:'更新数据失败'
+                ok: 0,
+                errorInfo: '更新数据失败'
             })
         }
 

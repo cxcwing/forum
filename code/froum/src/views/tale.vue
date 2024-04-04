@@ -60,7 +60,7 @@
             </div>
             <ul class="infinite-list" infinite-scroll-delay="5000" :infinite-scroll-distance="10"
                 style="overflow: auto">
-                <li v-for="item in taleList" :key="item.id" class="infinite-list-item list-item">
+                <li  v-for="item in taleList" :key="item.id"  @click="handleView(item.id)" class="infinite-list-item list-item">
                     <div class="border-bottom">
                         <div class='content-item'>
                             <div class="title">
@@ -78,20 +78,18 @@
                                         </el-icon> {{ item.lookNumber }}
                                     </div>
 
-                                    <div @click="handleLike(item)" :class="`likeBox  ${ifLike(item) ? 'beLiked' : ''}`" :data-id="item.id">
+                                    <div @click.stop="handleLike(item)" :class="`likeBox  ${isCollOrtoke(item.whoGood,userId) === 1? 'beLiked' : ''}`" :data-id="item.id">
 
                                         <el-icon :class="`like`">
                                             <MagicStick />
                                         </el-icon>
                                         {{ item.goodNumber }}
                                     </div>
-                                </div>
-                                <div class="body">
 
-                                    <span></span>
                                 </div>
+   
                                 <div class="after">
-                                    <span></span>
+                                    <span>{{whatType(item.type)}}</span>
                                 </div>
 
                             </div>
@@ -126,138 +124,145 @@
 import { Grid, Ship, Link, Bicycle, Pear, Headset, Warning } from '@element-plus/icons-vue'
 import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import axios from 'axios'
 import { ElMessage, ElNotification, componentSizeMap, ElMessageBox } from 'element-plus'
 import { MagicStick, View } from '@element-plus/icons-vue'
 import { timePanelSharedProps } from 'element-plus/es/components/time-picker/src/props/shared';
-
+const router = useRouter()
 const store = useStore()
+const userId = ref(store.state.userFormInfo._id)
 const taleList = ref([])
 const selectWhich = ref(0)
 const howSort = ref(0)
 const isDisabled = ref(false)
 const isMark = ref(false)
 const whatTime = ref('贵安！')
-
+const taleForm = ref({})
 let count = 1
 //有没有人点过赞 
+const handleView = (id)=>{
+    router.push(`/tale-view/${id}`)
+}
+const whatType = (type)=>{
+    if(type ===0 ){
+        return "非恐怖" 
+    }
+    else if(type === 1){
+        return "自创故事"
+    }
+    else if(type === 2){
+        return "据事实改编"
+    }
+    else if(type === 3){
+        return "我有一个朋友"
+    }
+    else if(type === 4){
+        return "搬运"
+    }
+    else if(type === 5){
+        return "我听说" 
+    }
+    else if(type === 6){
+        return "恐怖"
+    }
+}
+
+
+            
 const ifLike= (item)=>{
+    
     if(store.state.userFormInfo.toGood && store.state.userFormInfo.toGood.indexOf(item.id) != -1){
+
             return true
     }else{
+        console.log(store.state.userFormInfo.toGood.indexOf(item.id),item.id)
         return false
     }
 }
 
-const likeList = (item, id) => {
-
-    let likeArr = []
-    if (item) {
-        console.log(JSON.parse(item), JSON.parse(item).length)
-        likeArr = JSON.parse(item)
-        likeArr.push(id)
+const isCollOrtoke = (item, id) => {
+    // console.log(item,id)
+    if (item && item.length) {
+        let arr = JSON.parse(item)
+        if (arr.indexOf(id) != -1) {
+            return 1//非空 且有
+        } else {
+            return 2//非空 但是无
+        }
     } else {
-
-
-        likeArr.push(id)
+        return 0 //空
     }
-    return likeArr
 }
 
-const handleLike = async (item) => {
-
-
-    // console.log(store.state.userFormInfo.toGood,"55555555555555")
-    // console.log(Object.values(null),';aaaaaaaaa')
-    //1.点赞不为0 且点赞列表没有该作品 // 操作
-    //2.不为零，有该作品 // 点过不作为
-    //3.点赞为0 // 操作
-    // console.log(store.state.userFormInfo.toGood,'aaaaaaaaaaaaa')
-
-    if (store.state.userFormInfo._id) {
-        if (store.state.userFormInfo.toGood) {
-            console.log()
-            if (store.state.userFormInfo.toGood.indexOf(item.id) != -1) {
-
-            } else {
-                //没有
-                store.state.userFormInfo.toGood.indexOf(item.id)
-
-                let userGood = store.state.userFormInfo.toGood
-                userGood.push(item.id)
-                let likeArr = likeList(item.whoGood, store.state.userFormInfo._id)
-
-                let form = {
-                    likeArr: JSON.stringify(likeArr),
-                    userGood: JSON.stringify(userGood),
-                    taleId: item.id,
-                    userId: store.state.userFormInfo._id
-                }
-
-                axios.post(`/froumApi/froum/like`, form).then(res => {
-                    if (res.data.ok) {
-                        store.commit("changeUserFormInfo", res.data.data)
-                        console.log('1111111')
-                    }
-                    item.goodNumber++
-                    console.log('1111111')
-                }).catch(eror => {
-                    ElMessage({
-                        showClose: true,
-                        message: '登陆后才能点赞哦',
-                        type: 'warning',
-                    })
-
-                })
-            }
-        } else {
-
-            let userGood = []
-            console.log('aaaaaaaaaaaaaaaa')
-            let likeArr = likeList(item.whoGood, store.state.userFormInfo._id)
-            let form = {
-                likeArr: JSON.stringify(likeArr),
-                userGood: JSON.stringify(userGood),
-                taleId: item.id,
-                userId: store.state.userFormInfo._id
-            }
-            axios.post(`/froumApi/froum/like`, form).then(res => {
-                console.log(res.data, res.data.ok)
-                if (res.data.ok) {
-                    console.log('22222222222')
-                    store.commit("changeUserFormInfo", res.data.data)
-                }
-                console.log('22222222222')
-                item.goodNumber++
-                console.log('22222')
-            }).catch(eror => {
-                if (eror.response === 401) {
-                    ElMessage({
-                        showClose: true,
-                        message: '登陆后才能点赞哦',
-                        type: 'warning',
-                    })
-                }
-
-
-            })
-
-
-
-        }
-
-
-    } else {
-        ElMessage({
-            showClose: true,
-            message: '登陆后才能点赞哦',
-            type: 'warning',
-        })
-
+const handleLike = async (item) => {//点过
+    taleForm.value = item
+// console.log(isCollOrtoke(taleForm.value.whoGood,userId.value))
+// console
+if (isCollOrtoke(taleForm.value.whoGood, userId.value) === 1) {//删除
+    let arrLike = JSON.parse(taleForm.value.whoGood)
+    let arrUser = store.state.userFormInfo.toGood
+    let index1 = arrLike.indexOf(userId.value)
+    let index2 = arrUser.indexOf(taleForm.value.id)
+    console.log()
+    arrLike.splice(index1, 1)
+    arrUser.splice(index2, 1)
+    let form = {
+        likeArr: JSON.stringify(arrLike),
+        userGood: JSON.stringify(arrUser),
+        taleId: taleForm.value.id,
+        userId: userId.value
     }
-
-
-
+    let res = await axios.post(`/froumApi/froum/like`, form)
+    if (res.data.ok) {
+        console.log(res.data)
+        store.commit("changeUserFormInfo",res.data.data)
+        taleForm.value.whoGood = JSON.stringify(arrLike)
+        taleForm.value.goodNumber--
+    }
+} else if (isCollOrtoke(taleForm.value.whoGood, userId.value) === 2) {
+    let arrLike = JSON.parse(taleForm.value.whoGood)
+    let arrUser = store.state.userFormInfo.toGood
+    if (!arrUser) {
+        arrUser = []
+    }
+    arrLike.push(userId.value)
+        arrUser.push(taleForm.value.id)
+        let form = {
+            likeArr: JSON.stringify(arrLike),
+            userGood: JSON.stringify(arrUser),
+            taleId: taleForm.value.id,
+            userId: userId.value
+        }
+        let res = await axios.post(`/froumApi/froum/like`, form)
+        if (res.data.ok) {
+            console.log(res.data)
+            store.commit("changeUserFormInfo", res.data.data)
+            taleForm.value.whoGood = JSON.stringify(arrLike)
+            taleForm.value.goodNumber ++
+        }
+} else if (isCollOrtoke(taleForm.value.whoGood, userId.value) === 0) {
+    let arrLike = []
+    let arrUser = store.state.userFormInfo.toGood
+    if (!arrUser) {
+        arrUser = []
+    }
+    arrLike.push(userId.value)
+        arrUser.push(taleForm.value.id)
+        let form = {
+            likeArr: JSON.stringify(arrLike),
+            userGood: JSON.stringify(arrUser),
+            taleId: taleForm.value.id,
+            userId: userId.value
+        }
+        let res = await axios.post(`/froumApi/froum/like`, form).then(res =>{
+            console.log(res.data)
+            store.commit("changeUserFormInfo", res.data.data)
+            taleForm.value.whoGood = JSON.stringify(arrLike)
+            taleForm.value.goodNumber --
+        })
+      
+}
 }
 const handleMarck = async () => {
     let res = await axios.get(`/froumApi/froum/marck?id=${store.state.userFormInfo._id}`)
@@ -518,10 +523,23 @@ onUnmounted(() => {
     font-size: 13px;
     color: #8A919F;
     display: flex;
+    justify-content: space-between;
     /* height: 10px; */
 
 }
-
+.after{
+    color: #8A919F;
+    font-size: 12px;
+  
+}
+.after > span{
+    background-color: #cdced060;
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+.after:hover{
+   color:rgba(24, 220, 2, 0.914);
+}
 .image {
     height: 80px;
 

@@ -33,5 +33,5 @@ FroumViewRouter.post('/froumApi/froum/captchaSend',FroumController.captchaSend)
 FroumViewRouter.post('/froumApi/froum/register',FroumController.register)
 FroumViewRouter.post('/froumApi/froum/login',FroumController.login)
 FroumViewRouter.get('/froumApi/froum/getTaleList',FroumController.getTaleList)
-
+FroumViewRouter.get('/froumApi/froum/getTale',FroumController.getTale)
 module.exports = FroumViewRouter    
