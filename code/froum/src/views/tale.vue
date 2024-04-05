@@ -289,6 +289,7 @@ const contentValue = (content) => {
 
 const getList = async (id, num, page, sort) => {
     let res = await axios.get(`/froumApi/froum/getTaleList?id=${id}&num=${num}&page=${page}&Hsort=${sort}`)
+
     return res
 }
 
@@ -314,6 +315,7 @@ const handleSelect = async (evt) => {
 
     if (res.data.ok) {
         taleList.value = res.data.data
+        store.commit('changeTaleList',taleList.value)
     } else {
         taleList.value = []
     }
@@ -341,7 +343,8 @@ const handleScroll = async () => {
                 ...taleList.value,
                 ...res.data.data
             ]
-            console.log(taleList.value.length)
+       
+            store.commit('changeTaleList',taleList.value)
         } else {
             console.log('无了')
         }
@@ -351,7 +354,7 @@ onMounted(async () => {
 
     let userMarckTime = new Date(store.state.userFormInfo.marckTime)
     let nowTime = new Date()
-    console.log()
+
     if (userMarckTime.getDay() != nowTime.getDay()) {
         isMark.value = false
     } else {
@@ -361,7 +364,7 @@ onMounted(async () => {
     let res = await getList(selectWhich.value, 6, count, howSort.value)
     if (res.data.ok) {
         taleList.value = res.data.data
-
+        store.commit('changeTaleList',taleList.value)
     } else {
         taleList.value = []
     }

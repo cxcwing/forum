@@ -4,11 +4,16 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     massageIsShow:false,
-    userFormInfo:{}
+    userFormInfo:{},
+    taleList:[]
   },
   getters: {
   },
   mutations: {
+    changeTaleList(state,taleList){
+      // console.log(taleList)
+      state.taleList= taleList
+    },
     changeMassageIsShow(state,isShow){
       state.massageIsShow = isShow
       

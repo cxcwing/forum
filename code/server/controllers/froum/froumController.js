@@ -91,6 +91,12 @@ async function toAddLike(likeArr, num, userGood, taleId, userId) {
     let res = await sqlPool.query(`select * from users where _id=?`, [userId])
     return res[0]
 }
+async function toAddCollection(likeArr, userGood, taleId, userId) {
+    await sqlPool.query(`update users set collection=? where _id=?`, [userGood, userId])
+    await sqlPool.query(`update tale set whoCollection=? where id=?`, [likeArr,taleId])
+    let res = await sqlPool.query(`select * from users where _id=?`, [userId])
+    return res[0]
+}
 async function toGetTale(id) {
     let res = await sqlPool.query(`select * from tale where id=?`, [id])
     return res[0]
@@ -348,7 +354,35 @@ const froumController = {
             })
         }
 
-    }
+    },
+    collection: async (req, res) => {
+        let { likeArr, userGood, taleId, userId } = req.body
+        // console.log(likeArr,userGood,taleId,userId)
+
+        console.log(likeArr, userGood, taleId, userId)
+        let searchRes = await toAddCollection(likeArr,userGood, taleId, userId)
+        if (searchRes.length) {
+            let data = searchRes[0]
+            delete data.password
+            if (data.toGood) {
+                data.toGood = JSON.stringify(data.toGood)
+            }
+
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '更新数据失败'
+            })
+        }
+
+    },
+
 }
+
+
 
 module.exports = froumController

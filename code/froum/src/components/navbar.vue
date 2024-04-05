@@ -11,12 +11,19 @@
                 <el-menu-item index="/post">贴子</el-menu-item>
                 <el-menu-item index="/home">意见征集</el-menu-item>
                 <div class="searchInput">
-                    <el-input id="search" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
+                    <el-input id="search" @input="handleInput" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
                         class="input-with-select">
                         <template #append>
                             <el-button :icon="Search" />
                         </template>
                     </el-input>
+                    <div v-if="searchList.length" class="search-ul">
+                        <div  v-for="item in searchList" :key="item.id" class="search-li" @click="handleTo(item.id)">
+                            {{ item.title }}
+                        </div>
+              
+                
+                    </div>
                 </div>
                 <div class='avatar'>
                     <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
@@ -145,7 +152,11 @@
 import { ref,onMounted,computed } from 'vue'
 import { Search,Van,EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
 import { useStore } from 'vuex';
+import { useRoute,useRouter } from 'vue-router';
+
 import axios from 'axios';
+const route = useRoute()
+const router = useRouter()
 const store = useStore()
 const activeIndex = ref('/tale')
 const userForm = ref({})
@@ -153,6 +164,8 @@ const search = ref('')
 const form = ref('form')
 const avatarClass = ref('one')
 const idLevel = ref('idLevel')
+const searchList = ref([])
+
 const avatarHover = () => {
     // console.log(1)
     form.value = 'form formHover'
@@ -165,10 +178,24 @@ const mouseOut = () => {
     form.value = 'form'
     avatarClass.value = 'one'
 }
+const handleTo = (id) =>{
+    router.push(`/tale-view/${id}`)
+    search.value = ''
+    searchList.value =[]
+}
 const handleExit = ()=>{
     localStorage.removeItem('Ctoken')
     localStorage.removeItem('vuex')
     window.location.href = '/login'
+}
+const handleInput = (evt)=>{
+    if(evt){
+        searchList.value =  store.state.taleList.filter((item) => item.title.includes(evt))
+     
+    }else{
+        searchList.value =[]
+    }
+
 }
 const howCollection = computed(()=>{
     // userForm.collection===null?0:userForm.collection.length
@@ -383,6 +410,31 @@ onMounted(async ()=>{
 .searchInput {
     margin-top: 12px;
     margin-left: 10%;
+    position:relative;
+}
+.search-ul{
+    position: absolute;
+    max-height: 500px;
+    width: 400px;
+    top:45px;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid rgba(88, 86, 86, 0.077);
+    padding-top:5px;
+    padding-bottom:1px;
+ 
+}
+.search-li{
+   
+    background-color: white;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 2px;
+    color: #414241;
+}
+.search-li:hover{
+    background-color: #6f746e46;
+    cursor: pointer;
 }
 
 .top {
