@@ -116,7 +116,7 @@ const statistics = (arr) => {
             item.HowCollection = 0
         }
         if (item.Comment) {
-            item.HowComment = item.HowComment.length
+            item.HowComment = item.Comment
         } else {
             item.HowComment = 0
         }
@@ -152,13 +152,13 @@ const handleSwitchChange = async (data) => {
     if (res.data.ok && data.isPublish) {
         ElNotification({
             title: '操作成功',
-            message: h('i', { style: 'color: teal' }, '故事已经成功发布'),
+            message: h('i', { style: 'color: teal' }, '贴子已经成功发布'),
             duration: '1500'
         })
     } else if (res.data.ok && !data.isPublish) {
         ElNotification({
             title: '操作成功',
-            message: h('i', { style: 'color: gray' }, '故事已经取消发布'),
+            message: h('i', { style: 'color: gray' }, '贴子已经取消发布'),
             duration: '1500'
         })
     }

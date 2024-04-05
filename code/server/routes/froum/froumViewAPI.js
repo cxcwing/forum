@@ -32,6 +32,17 @@ FroumViewRouter.get(`/froumAPI/froumView/getPostList`,FroumController.getPostLis
 FroumViewRouter.post('/froumApi/froum/captchaSend',FroumController.captchaSend)
 FroumViewRouter.post('/froumApi/froum/register',FroumController.register)
 FroumViewRouter.post('/froumApi/froum/login',FroumController.login)
+
 FroumViewRouter.get('/froumApi/froum/getTaleList',FroumController.getTaleList)
 FroumViewRouter.get('/froumApi/froum/getTale',FroumController.getTale)
+FroumViewRouter.get('/froumApi/froum/getTaleComment',FroumController.getTaleComment)
+FroumViewRouter.get('/froumApi/froum/getAuthor',FroumController.getAuthor)
+FroumViewRouter.get('/froumApi/froum/getHot',FroumController.getHot)
+
+FroumViewRouter.get('/froumApi/froum/getPostList',FroumController.getPostList)
+FroumViewRouter.get('/froumApi/froum/getPost',FroumController.getPost)
+FroumViewRouter.get('/froumApi/froum/getPostComment',FroumController.getPostComment)
+
+
+
 module.exports = FroumViewRouter    

@@ -13,7 +13,7 @@
                 </div>
                 <div class="left-item ">
                     <el-tag class="left-el-tag" :type="info" color="rgb(138, 145, 159)" effect="dark" round>
-                        {{ HowComment(taleForm.Comment) }}
+                        {{ taleForm.Comment }}
                     </el-tag>
                     <el-icon class="left-el-icon">
                         <Comment />
@@ -32,27 +32,61 @@
                 <div></div>
             </div>
             <div class="center">
-                <h1> {{ taleForm.title }}</h1>
-                <div class="twoBox">
-                    <span class="two">{{ taleForm.author }}</span>
-                    <span class="two">{{ whatTime(taleForm.time) }}</span>
-                    <span class="two">
-                        <el-icon class="eyse">
-                            <View />
-                        </el-icon> {{ taleForm.lookNumber }}
-                    </span>
-                    <el-divider>
-                        <el-icon><star-filled /></el-icon>
-                    </el-divider>
-                </div>
-                <div class="contentBox1008611">
-                    <div v-html="taleForm.content"></div>
-                </div>
-                <div class="Comment">
+                <div class="contentBox">
+                    <h1> {{ taleForm.title }}</h1>
+                    <div class="twoBox">
+                        <span class="two">{{ taleForm.author }}</span>
+                        <span class="two">{{ whatTime(taleForm.time) }}</span>
+                        <span class="two">
+                            <el-icon class="eyse">
+                                <View />
+                            </el-icon> {{ taleForm.lookNumber }}
+                        </span>
+                        <el-divider>
+                            <el-icon><star-filled /></el-icon>
+                        </el-divider>
+                    </div>
 
+                    <div class="contentBox1008611">
+                        <div v-html="taleForm.content"></div>
+                    </div>
+                </div>
+
+                <div class="Comment">
+                    <div class="comment-editor">
+                        <editor></editor>
+                    </div>
+
+                    <div class="comment-content-box">
+                        <div v-for="item in commentForm" :key="item.id" class="comment-content-box-item">
+                            <div class="comment-content-box-item-left">
+                                <el-avatar :src="`http://localhost:3000${item.userAvatar}`" />
+                            </div>
+                            <div calss="comment-content-box-item-right">
+                                <div class="comment-content-box-item-right-username">{{ item.userName }}</div>
+                                <div class="comment-content-box-item-right-content">{{ item.content }}
+
+                                </div>
+                       
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+
+            </div>
+            <div class="right">
+                <div class="right-one">
+                    <div class="right-one-avatar">
+                        <el-avatar :size="60" :src="`http://localhost:3000${authorItem.avatar}`" />
+                    </div>
+                    <div >
+                        <div class="right-one-username"> {{ authorItem.username }}</div>
+                        <div class="right-one-introduction">{{ authorItem.introduction }}</div>
+                    </div>
+                 
                 </div>
             </div>
-            <div class="right">3</div>
 
         </div>
     </div>
@@ -75,7 +109,8 @@ const userForm = ref({})
 const taleForm = ref({})
 const isActive = ref('active')
 const userId = ref(0)
-
+const commentForm = ref({})
+const authorItem = ref({})
 const whatTime = (time) => {
     let date = new Date(time)
     let year = date.getFullYear()
@@ -133,7 +168,7 @@ const handleLike = async () => {//点过
         }
         let res = await axios.post(`/froumApi/froum/like`, form)
         if (res.data.ok) {
-            console.log(res.data)
+
             store.commit("changeUserFormInfo", res.data.data)
             taleForm.value.whoGood = JSON.stringify(arrLike)
             taleForm.value.goodNumber--
@@ -188,12 +223,11 @@ const handleCollection = async () => {//点过
     console.log(isCollOrtoke(taleForm.value.whoCollection, userId.value))
     // console
     if (isCollOrtoke(taleForm.value.whoCollection, userId.value) === 1) {//删除
-        console.log('55555555555555555555')
         let arrLike = JSON.parse(taleForm.value.whoCollection)
         let arrUser = store.state.userFormInfo.collection
         let index1 = arrLike.indexOf(userId.value)
         let index2 = arrUser.indexOf(taleForm.value.id)
-        console.log('55555555555555555555')
+ 
         arrLike.splice(index1, 1)
         arrUser.splice(index2, 1)
         let form = {
@@ -248,7 +282,7 @@ const handleCollection = async () => {//点过
             userId: userId.value
         }
         let res = await axios.post("/froumApi/froum/collection", form).then(res => {
-            console.log(res.data)
+
             store.commit("changeUserFormInfo", res.data.data)
             taleForm.value.whoCollection = JSON.stringify(arrLike)
 
@@ -263,12 +297,19 @@ onMounted(() => {
     // console.log(route.params.id)
     userId.value = store.state.userFormInfo._id
     axios.get(`/froumApi/froum/getTale?id=${route.params.id}`).then(res => {
-        // console.log(res.data)
         userForm.value = res.data.athorData
         taleForm.value = res.data.data
-        // console.log(isCollOrtoke(taleForm.value.whoGood,store.state.userFormInfo._id))
+        
+        axios.get(`/froumApi/froum/getAuthor?id=${taleForm.value.authorId}`).then(res2 =>{
+            authorItem.value = res2.data.data
+    
+        })
+    })
+    axios.get(`/froumApi/froum/getTaleComment?id=${route.params.id}`).then(res => {
+        commentForm.value = res.data.data
 
     })
+   
 })
 
 
@@ -348,14 +389,14 @@ onMounted(() => {
 .center {
     flex: 7;
     margin-right: 10px;
-    background-color: white;
-    padding: 30px;
+
+
     border-radius: 5px;
 }
 
 .right {
-    flex: 2;
-    background-color: violet;
+    flex: 3;
+
 }
 
 .twoBox {
@@ -371,11 +412,72 @@ onMounted(() => {
 
 .contentBox {
     margin-top: 20px;
-
+    background-color: white;
+    padding: 30px;
+    border-radius: 5px;
 }
 
 .contentBox1008611 {
     margin-top: 30px;
+}
+
+.comment-editor {
+    background-color: white;
+    width: 100%;
+    border-radius: 7px;
+    margin-top: 30px;
+    margin-bottom: 70px;
+    padding-bottom: 10px;
+}
+
+.Comment {
+    background-color: white;
+    padding: 20px;
+}
+
+.comment-content-box-item{
+    padding:15px 0px ;
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom:1px solid rgba(219, 217, 217, 0.252);
+}
+.comment-content-box-item-left{
+    margin-right:20px;
+}
+.comment-content-box-item-right-username{
+    color: rgba(24, 220, 2, 0.88);
+    padding:5px 0;
+}
+.comment-content-box-item-right-content{
+    max-width: 600px;
+    word-wrap: break-word;
+    font-size: 16px;
+    color: #5b5b5b;
+}
+.right-one{
+    padding: 12px;
+    background-color: white;
+    border-radius: 5px;
+    /* margin-top:20px; */
+    position: sticky;
+    top:10vh;
+    display: flex;
+
+}
+.right-one-avatar{
+    margin-right: 20px;
+}
+.right-one-username{
+    color: rgba(24, 220, 2, 0.88);
+    font-weight: 600;
+}
+.right-one-introduction{
+    padding:3px 0px;
+    color: #8A919F;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 240px;
 }
 </style>
 <style lang="scss">

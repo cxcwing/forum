@@ -58,7 +58,7 @@
 
                 </div>
             </div>
-            <ul class="infinite-list" infinite-scroll-delay="5000" :infinite-scroll-distance="10"
+            <ul v-if="taleList.length" class="infinite-list" infinite-scroll-delay="5000" :infinite-scroll-distance="10"
                 style="overflow: auto">
                 <li  v-for="item in taleList" :key="item.id"  @click="handleView(item.id)" class="infinite-list-item list-item">
                     <div class="border-bottom">
@@ -103,6 +103,7 @@
                     </div>
                 </li>
             </ul>
+            <div v-else>  <el-empty :image-size="200"  description="暂无此类型，快来创作吧！"/></div>
         </div>
         <div class="right">
             <div class="rightOne">
@@ -115,7 +116,27 @@
                 </div>
                 <div v-else class="rightMark">已签到</div>
             </div>
-            <div class="rightTwo">作品榜</div>
+            <div class="rightTwo">
+                <div class="rightTwo-title">
+                    作品榜
+                </div>
+                <div class="rightTwo-list-box">
+                    
+                    <div v-for="item in hotForm" class="rightTwo-list-box-item"  @click="handleView(item.id)">
+                       <p class="rightTwo-list-box-item-top">
+                         {{ item.title }}
+                        </p>
+                       <div class="rightTwo-list-box-item-bottom"> 
+                        <spam>{{ item.lookNumber }} 阅读</spam>
+                        <spam>{{ item.goodNumber }} 点赞</spam>
+
+                       </div>
+                    </div>
+
+
+                </div>
+
+            </div>
 
         </div>
     </div>
@@ -129,6 +150,7 @@ import axios from 'axios'
 import { ElMessage, ElNotification, componentSizeMap, ElMessageBox } from 'element-plus'
 import { MagicStick, View } from '@element-plus/icons-vue'
 import { timePanelSharedProps } from 'element-plus/es/components/time-picker/src/props/shared';
+const hotForm = ref([])
 const router = useRouter()
 const store = useStore()
 const userId = ref(store.state.userFormInfo._id)
@@ -140,7 +162,10 @@ const isMark = ref(false)
 const whatTime = ref('贵安！')
 const taleForm = ref({})
 let count = 1
+
+
 //有没有人点过赞 
+
 const handleView = (id)=>{
     router.push(`/tale-view/${id}`)
 }
@@ -369,6 +394,10 @@ onMounted(async () => {
         taleList.value = []
     }
 
+    axios.get(`/froumApi/froum/getHot`).then(res=>{
+        hotForm.value = res.data.data
+       
+    })
 })
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
@@ -655,13 +684,35 @@ onUnmounted(() => {
 }
 
 .rightTwo {
-    height: 100px;
+    
     background-color: white;
     padding: 12px;
     margin-top: 20px;
     border-radius: 8px;
 }
 
+.rightTwo-title{
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(145, 152, 145, 0.644); 
+}
+.rightTwo-list-box{
+    margin-top: 15px;
+}
+.rightTwo-list-box-item{
+    cursor: pointer;
+}
+.rightTwo-list-box-item-bottom{
+    font-size: 15px;
+    color: #8a919f;
+    margin-bottom: 10px;
+}
+.rightTwo-list-box-item-top{
+    margin-bottom: 10px;
+}
+.rightTwo-list-box-item:hover>.rightTwo-list-box-item-top{
+    color:rgb(24, 220, 2);
+
+}
 .rightMark {
     margin-top: 10px;
     background-color: rgba(135, 248, 137, 0.148);

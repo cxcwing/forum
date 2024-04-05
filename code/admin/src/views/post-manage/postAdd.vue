@@ -120,7 +120,7 @@ const rules = reactive({
 let views = ref()
 
 const WhenInput = (data) => {
-    console.log(taleForm.value.content)
+
 
     // views.value = editorData.value
 }

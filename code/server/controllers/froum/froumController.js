@@ -72,10 +72,10 @@ async function toLogin(username, password) {
 async function toGetTaleList(id) {
     if (id === 0) {
         //除了id = 6
-        let data = await sqlPool.query(`select * from tale where type!=?`, [6])
+        let data = await sqlPool.query(`select * from tale where type!=? and isPublish != 0`, [6])
         return data[0]
     } else {
-        let data = await sqlPool.query(`select * from tale where type=?`, [id])
+        let data = await sqlPool.query(`select * from tale where type=? and isPublish != 0`, [id])
         return data[0]
     }
 }
@@ -91,27 +91,172 @@ async function toAddLike(likeArr, num, userGood, taleId, userId) {
     let res = await sqlPool.query(`select * from users where _id=?`, [userId])
     return res[0]
 }
+async function toAddPostLike(likeArr, num, userGood, taleId, userId) {
+    await sqlPool.query(`update users set toGoodPost=? where _id=?`, [userGood, userId])
+    await sqlPool.query(`update post set whoGood=?,goodNumber=? where id=?`, [likeArr, num, taleId])
+    let res = await sqlPool.query(`select * from users where _id=?`, [userId])
+    return res[0]
+}
 async function toAddCollection(likeArr, userGood, taleId, userId) {
     await sqlPool.query(`update users set collection=? where _id=?`, [userGood, userId])
-    await sqlPool.query(`update tale set whoCollection=? where id=?`, [likeArr,taleId])
+    await sqlPool.query(`update tale set whoCollection=? where id=?`, [likeArr, taleId])
+    let res = await sqlPool.query(`select * from users where _id=?`, [userId])
+    return res[0]
+}
+async function toAddCollectionPost(likeArr, userGood, taleId, userId) {
+    await sqlPool.query(`update users set collectionPost=? where _id=?`, [userGood, userId])
+    await sqlPool.query(`update post set whoCollection = ? where id=?`, [likeArr, taleId])
     let res = await sqlPool.query(`select * from users where _id=?`, [userId])
     return res[0]
 }
 async function toGetTale(id) {
-    let res = await sqlPool.query(`select * from tale where id=?`, [id])
+    await sqlPool.query(`update tale set lookNumber = lookNumber + 1 where id=?`, [id])
+    let res = await sqlPool.query(`select * from tale where id=? and isPublish != 0`, [id])
     return res[0]
 }
 async function toGetAuthor(id) {
-    let res = await sqlPool.query(`select * from users where _id =?`, [id])
+    let res = await sqlPool.query(`select * from users where _id =? `, [id])
+    return res[0]
+}
+
+async function toCommentUpdate(textId, content, userId, userName, userAvatar) {
+    await sqlPool.query(`insert into comment (textId,content,userId,userName,userAvatar) values (?,?,?,?,?)`, [textId, content, userId, userName, userAvatar])
+    await sqlPool.query(`update tale set Comment = Comment + 1 where id=?`, [textId])
+
+}
+async function toCommentUpdate(textId, content, userId, userName, userAvatar) {
+    await sqlPool.query(`insert into comment (postId,content,userId,userName,userAvatar) values (?,?,?,?,?)`, [textId, content, userId, userName, userAvatar])
+    await sqlPool.query(`update post set Comment = Comment + 1 where id=?`, [textId])
+
+}
+
+async function toGetTaleComment(id) {
+    let res = await sqlPool.query(`select * from comment where textId = ?`, [id])
+    return res[0]
+}
+async function toGetPostComment(id) {
+    let res = await sqlPool.query(`select * from comment where postId = ?`, [id])
+    return res[0]
+}
+async function toGetAuthor(id) {
+    let res = await sqlPool.query(`select * from users where _id = ?`, [id])
+    return res[0]
+}
+async function toGetPost() {
+    let res = await sqlPool.query(`select * from post where isPublish != 0`)
+    return res[0]
+}
+async function toGetAllTale() {
+    let res = await sqlPool.query(`select * from tale where isPublish != 0`)
+    return res[0]
+}
+
+async function toGetPostList(id) {
+  
+    if(id === 100){
+
+        let data = await sqlPool.query(`select * from post where isPublish != 0`)
+        return data[0]
+    }else{
+        let data = await sqlPool.query(`select * from post where type=? and isPublish != 0`,[id])
+        return data[0]
+    }
+  
+
+}
+async function toGetThePost(id) {
+    await sqlPool.query(`update post set lookNumber = lookNumber + 1 where id=?`, [id])
+    let res = await sqlPool.query(`select * from post where id=? and isPublish != 0`, [id])
     return res[0]
 }
 
 const froumController = {
-    getPostList: (req, res) => {
-        res.send({
-            ok: 1
+    getPostList: async (req, res) => {
+        let id = parseInt(req.query.id)
+        let { num, page, Hsort } = req.query
+        num = parseInt(num)
+        page = parseInt(page)
+        Hsort = parseInt(Hsort)
+        let searchRes = await toGetPostList(id)
+        searchRes.forEach((item) => {
+            if (item.whoGood) {
+                item.whoGood = JSON.stringify(item.whoGood)
+               
+            }
         })
+
+        let end = num * page
+        let begin = end - num
+        console.log(searchRes,'aa   ')
+        if (searchRes.length && begin <= searchRes.length) {
+            // console.log(data)
+
+            if (Hsort === 0) {
+                searchRes.sort((a, b) => parseInt(b.lookNumber) - parseInt(a.lookNumber))
+
+            } else if (Hsort === 1) {
+                searchRes.sort((a, b) => {
+                    return new Date(b.time) - new Date(a.time)
+                })
+
+            }
+
+            if (end > searchRes.length && end - num < searchRes.length) {
+                end = searchRes.length
+            }
+
+            let data = searchRes.slice(begin, end)
+
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            // console.log('wu')
+            res.send({
+                ok: 0,
+                error: '暂无数据'
+            })
+        }
+
     },
+    getPost: async (req, res) => {
+
+        let id = parseInt(req.query.id)
+        let data = await toGetThePost(id)
+
+        console.log()
+        if (data.length) {
+            data = data[0]
+            let authorId = data.authorId
+            let authorData = await toGetAuthor(authorId)
+            if (data.whoCollection) {
+                data.whoCollection = JSON.stringify(data.whoCollection)
+            }
+            if (data.whoGood) {
+                data.whoGood = JSON.stringify(data.whoGood)
+            }
+            if (data.Comment) {
+                data.Comment = JSON.stringify(data.Comment)
+            }
+            if (authorData.length) {
+                authorData = authorData[0]
+                delete authorData.password
+                res.send({
+                    ok: 1,
+                    data,
+                    authorData
+                })
+            }
+
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '查无此贴'
+            })
+        }
+    },
+ 
     captchaSend: async (req, res) => {
         maileOption.to = req.body.email
         let Captcha = parseInt(Math.random() * 1000000)
@@ -270,7 +415,7 @@ const froumController = {
     },
 
     getTale: async (req, res) => {
-        console.log(req.query)
+
         let id = parseInt(req.query.id)
         let data = await toGetTale(id)
 
@@ -306,8 +451,67 @@ const froumController = {
         }
 
     },
+    getTaleComment: async (req, res) => {
 
+        let id = parseInt(req.query.id)
+        let searchRes = await toGetTaleComment(id)
 
+        res.send({
+            ok: 1,
+            data: searchRes
+        })
+    },
+    getPostComment: async (req, res) => {
+
+        let id = parseInt(req.query.id)
+        let searchRes = await toGetPostComment(id)
+        
+        res.send({
+            ok: 1,
+            data: searchRes
+        })
+    },
+    
+    getAuthor: async (req, res) => {
+        console.log(req.query)
+        let id = parseInt(req.query.id)
+        let searchRes = await toGetAuthor(id)
+        if (searchRes.length) {
+            let data = searchRes[0]
+            delete data.password
+            delete data.email
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '查无此人'
+            })
+        }
+
+    },
+    getHot: async (req, res) => {
+        let postRes = await toGetPost()
+        let taleRes = await toGetAllTale()
+        let list = [...postRes, ...taleRes]
+        list.sort((a, b) => (b.goodNumber + b.lookNumber) - (a.goodNumber + a.lookNumber))
+        if (list.length >= 6) {
+            let data = list.slice(0, 6)
+
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            res.send({
+                ok: 1,
+                data: list
+            })
+        }
+
+    },
 
 
 
@@ -355,16 +559,75 @@ const froumController = {
         }
 
     },
+    postLike: async (req, res) => {
+        let { likeArr, userGood, taleId, userId } = req.body
+        // console.log(likeArr,userGood,taleId,userId)
+        let num = JSON.parse(likeArr).length
+        console.log(likeArr, userGood, taleId, userId)
+        let searchRes = await toAddPostLike(likeArr, num, userGood, taleId, userId)
+        if (searchRes.length) {
+            let data = searchRes[0]
+            delete data.password
+            if (data.toGood) {
+                data.toGood = JSON.stringify(data.toGood)
+            }
+            if(data.toGoodPost){
+                data.toGoodPost = JSON.stringify(data.toGoodPost)
+            }
+
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '更新数据失败'
+            })
+        }
+
+    },
     collection: async (req, res) => {
         let { likeArr, userGood, taleId, userId } = req.body
         // console.log(likeArr,userGood,taleId,userId)
 
         console.log(likeArr, userGood, taleId, userId)
-        let searchRes = await toAddCollection(likeArr,userGood, taleId, userId)
+        let searchRes = await toAddCollection(likeArr, userGood, taleId, userId)
         if (searchRes.length) {
             let data = searchRes[0]
             delete data.password
             if (data.toGood) {
+                data.toGood = JSON.stringify(data.toGood)
+            }
+            if (data.toGoodPost) {
+                data.toGoodPost = JSON.stringify(data.toGoodPost)
+            }
+            
+            res.send({
+                ok: 1,
+                data
+            })
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '更新数据失败'
+            })
+        }
+
+    },
+    collectionPost: async (req, res) => {
+        let { likeArr, userGood, taleId, userId } = req.body
+        // console.log(likeArr,userGood,taleId,userId)
+
+        console.log(likeArr, userGood, taleId, userId)
+        let searchRes = await toAddCollectionPost(likeArr, userGood, taleId, userId)
+        if (searchRes.length) {
+            let data = searchRes[0]
+            delete data.password
+            if (data.toGoodPost) {
+                data.toGoodPost = JSON.stringify(data.toGoodPost)
+            }
+            if(data.toGood){
                 data.toGood = JSON.stringify(data.toGood)
             }
 
@@ -380,6 +643,24 @@ const froumController = {
         }
 
     },
+    commentUpdate: async (req, res) => {
+        let { textId, content, userId, userName, userAvatar } = req.body
+        console.log(textId, content, userId, userName, userAvatar)
+        await toCommentUpdate(textId, content, userId, userName, userAvatar)
+
+        res.send({
+            ok: 1
+        })
+    },
+    commentUpdatePost: async (req, res) => {
+        let { textId, content, userId, userName, userAvatar } = req.body
+        console.log(textId, content, userId, userName, userAvatar)
+        await toCommentUpdate(textId, content, userId, userName, userAvatar)
+
+        res.send({
+            ok: 1
+        })
+    }
 
 }
 

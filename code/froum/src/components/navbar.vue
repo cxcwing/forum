@@ -9,7 +9,7 @@
                 </div>
                 <el-menu-item index="/tale">故事</el-menu-item>
                 <el-menu-item index="/post">贴子</el-menu-item>
-                <el-menu-item index="/home">意见征集</el-menu-item>
+                <!-- <el-menu-item index="/home">意见征集</el-menu-item> -->
                 <div class="searchInput">
                     <el-input id="search" @input="handleInput" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
                         class="input-with-select">
@@ -179,7 +179,13 @@ const mouseOut = () => {
     avatarClass.value = 'one'
 }
 const handleTo = (id) =>{
-    router.push(`/tale-view/${id}`)
+    let arr2 = window.location.href.split('/')
+    if(arr2[arr2.length -1].includes('post')){
+        router.push(`/post-view/${id}`)
+    }else if(arr2[arr2.length -1].includes('tale')){
+        router.push(`/tale-view/${id}`)
+    }
+   
     search.value = ''
     searchList.value =[]
 }
@@ -189,12 +195,30 @@ const handleExit = ()=>{
     window.location.href = '/login'
 }
 const handleInput = (evt)=>{
+   
+     let arr2 = window.location.href.split('/')
+   
+     if(arr2[arr2.length -1].includes('post')){
+      
+        if(evt){
+        searchList.value =  store.state.postList.filter((item) => item.title.includes(evt))
+        console.log(searchList.value)
+     
+    }else{
+        searchList.value =[]
+    }
+     }else if(arr2[arr2.length -1].includes('tale')){
+           
     if(evt){
         searchList.value =  store.state.taleList.filter((item) => item.title.includes(evt))
      
     }else{
         searchList.value =[]
     }
+     }
+  
+        
+ 
 
 }
 const howCollection = computed(()=>{

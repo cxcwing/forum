@@ -118,13 +118,13 @@ const statistics = (arr) => {
             item.HowCollection = 0
         }
         if (item.Comment) {
-            item.HowComment = item.HowComment.length
+            item.HowComment = item.Comment
         } else {
-            item.HowComment = 0
+            item.HowComment = item.Comment
         }
         if (item.isPublish) {
             item.isPublish = true
-        } else {
+        } else{
             item.isPublish = false
 
         }

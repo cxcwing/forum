@@ -1,19 +1,15 @@
 <template>
-    <div class="mainBox">
-        <div class='left'>1</div>
-        <div class='center'>
-            
-        </div>  
-        <div class="right">3</div>
-    </div>
+    
 </template>
-<script>
-
-
+<script setup>
+import { reactive, ref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+const title = ref('')
 </script>
 <style scoped>
-    .mainBox{
-        display:flex;
-    }
+.mainBox {
+    width: 85%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
 </style>
-
