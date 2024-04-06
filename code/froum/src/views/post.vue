@@ -106,7 +106,7 @@
                 </div>
                 <div class="rightTwo-list-box">
                     
-                    <div v-for="item in hotForm" class="rightTwo-list-box-item"  @click="handleView(item.id)">
+                    <div v-for="item in hotForm" class="rightTwo-list-box-item"  @click="hotHandleView(item.id)">
                        <p class="rightTwo-list-box-item-top">
                          {{ item.title }}
                         </p>
@@ -149,7 +149,14 @@ let count = 1
 
 
 //有没有人点过赞 
+const hotHandleView = (item)=>{
+    if(item.isPost){
+        router.push(`/post-view/${item.id}`)
+    }else{
 
+        router.push(`/tale-view/${item.id}`)
+    }
+}
 const handleView = (id)=>{
     router.push(`/post-view/${id}`)
 }
@@ -490,7 +497,7 @@ onUnmounted(() => {
     background-color: rgba(24, 220, 2, 0.914);
 }
 
-.sort-be-select {}
+
 
 
 .title {
@@ -726,6 +733,7 @@ onUnmounted(() => {
     padding-left: 3px;
     margin-left: 12px;
     width: 85%;
+
     line-height: 50px;
     /* width: 100%; */
     height: 50px;

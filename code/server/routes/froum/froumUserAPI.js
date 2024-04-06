@@ -27,8 +27,16 @@ let createFolder = function(folder) {
  FroumUserRouter.get("/froumApi/froum/marck",FroumController.marck)
  FroumUserRouter.post("/froumApi/froum/like",FroumController.like)
  FroumUserRouter.post("/froumApi/froum/collection",FroumController.collection)
+
  FroumUserRouter.post("/froumApi/froum/commentUpdate",FroumController.commentUpdate)
+
  FroumUserRouter.post("/froumApi/froum/postLike",FroumController.postLike)
+
  FroumUserRouter.post("/froumApi/froum/collectionPost",FroumController.collectionPost)
+
  FroumUserRouter.post("/froumApi/froum/commentUpdatePost",FroumController.commentUpdatePost)
+
+ FroumUserRouter.get("/froumApi/froum/getUser",FroumController.getUser)
+ FroumUserRouter.get("/froumApi/froum/getUserArticle",FroumController.getUserArticle)
+
 module.exports = FroumUserRouter

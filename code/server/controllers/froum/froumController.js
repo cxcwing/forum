@@ -346,6 +346,9 @@ const froumController = {
                 data.toGood = JSON.stringify(data.toGood)
 
             }
+            if(data.toGoodPost){
+                data.toGoodPost = JSON.stringify(data.toGoodPost)
+            }
             // console.log(data.toGood,data.toGood.length)
 
             const Ctoken = JWT.create({ username, _id }, '180d')
@@ -417,39 +420,44 @@ const froumController = {
     getTale: async (req, res) => {
 
         let id = parseInt(req.query.id)
-        let data = await toGetTale(id)
+        if(id){
+            let data = await toGetTale(id)
 
-        console.log()
-        if (data.length) {
-            data = data[0]
-            let authorId = data.authorId
-            let authorData = await toGetAuthor(authorId)
-            if (data.whoCollection) {
-                data.whoCollection = JSON.stringify(data.whoCollection)
-            }
-            if (data.whoGood) {
-                data.whoGood = JSON.stringify(data.whoGood)
-            }
-            if (data.Comment) {
-                data.Comment = JSON.stringify(data.Comment)
-            }
-            if (authorData.length) {
-                authorData = authorData[0]
-                delete authorData.password
+            console.log()
+            if (data.length) {
+                data = data[0]
+                let authorId = data.authorId
+                let authorData = await toGetAuthor(authorId)
+                if (data.whoCollection) {
+                    data.whoCollection = JSON.stringify(data.whoCollection)
+                }
+                if (data.whoGood) {
+                    data.whoGood = JSON.stringify(data.whoGood)
+                }
+                if (data.Comment) {
+                    data.Comment = JSON.stringify(data.Comment)
+                }
+                if (authorData.length) {
+                    authorData = authorData[0]
+                    delete authorData.password
+                    res.send({
+                        ok: 1,
+                        data,
+                        authorData
+                    })
+                }
+    
+            } else {
                 res.send({
-                    ok: 1,
-                    data,
-                    authorData
+                    ok: 0,
+                    errorInfo: '查无此故事'
                 })
             }
-
-        } else {
-            res.send({
-                ok: 0,
-                errorInfo: '查无此故事'
-            })
+    
+        }else{
+            res.send({ok:0,errorInfo:'查无此故事'})
         }
-
+      
     },
     getTaleComment: async (req, res) => {
 
@@ -527,6 +535,9 @@ const froumController = {
         // console.log(data)
         if (data.toGood) {
             data.toGood = JSON.stringify(data.toGood)
+        }
+        if(data.toGoodPost){
+            data.toGoodPost = JSON.stringify(data.toGoodPost)
         }
         res.send({
             ok: 1,
@@ -659,6 +670,45 @@ const froumController = {
 
         res.send({
             ok: 1
+        })
+    },
+    getUser:async (req,res) =>{
+ 
+        let _id = parseInt(req.query.id)
+        let searchRes = await sqlPool.query('select * from users where _id = ?',[_id] )
+        searchRes = searchRes[0]
+        if(searchRes.length){
+            let data = searchRes[0]
+            delete data.password
+            if(data.toGoodPost) {
+                data.toGoodPost = JSON.stringify(data.toGoodPost)
+            }
+            if(data.toGood){
+                data.toGood = JSON.stringify(data.toGood)
+            }
+            res.send({
+                ok:1,
+                data
+            })
+        }else{
+            res.send({
+                ok:0,
+                errorInfo:'查无此人'
+            })
+        }
+    },
+    getUserArticle:async (req,res)=>{
+   
+        let id = parseInt(req.query.id)
+        let postList = await sqlPool.query(`select * from post where authorId = ?`,[id])
+        let taleList = await sqlPool.query(`select * from tale where authorId = ?`,[id])
+        postList = postList[0]
+        taleList = taleList[0]
+
+        res.send({
+            ok:1,
+            postList,
+            taleList
         })
     }
 

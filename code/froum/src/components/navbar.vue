@@ -9,7 +9,7 @@
                 </div>
                 <el-menu-item index="/tale">故事</el-menu-item>
                 <el-menu-item index="/post">贴子</el-menu-item>
-                <!-- <el-menu-item index="/home">意见征集</el-menu-item> -->
+                <!-- <el-menu-item index="/home">个人中心</el-menu-item> -->
                 <div class="searchInput">
                     <el-input id="search" @input="handleInput" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
                         class="input-with-select">
@@ -27,14 +27,14 @@
                 </div>
                 <div class='avatar'>
                     <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
-                    :src='`http://localhost:3000${userForm.avatar}`'/>
+                    :src='`http://localhost:3000${store.state.userFormInfo.avatar}`'/>
                     <el-avatar v-else="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
                     :src='`http://localhost:3000/images/1711108153245-0.png`'/>
                     <div v-if="userForm._id" @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
 
                         <span class="username">{{ userForm.username }}</span>
                         <div class="idLevelBox">
-                            <span :class="idLevel">普通用户</span>
+                            <span :class="idLevel">{{ whatRole() }}</span>
                             <span>lv{{ userForm.level }}</span>
                         </div>
                         <div class="powerBox">
@@ -56,7 +56,7 @@
 
                         </div>
                         <div class="guangGao">广告位招租 </div>
-                        <div class="center goToBox">
+                        <div @click="handleCenter" class="center goToBox">
                             <el-icon>
                                 <User />
                             </el-icon>
@@ -165,7 +165,14 @@ const form = ref('form')
 const avatarClass = ref('one')
 const idLevel = ref('idLevel')
 const searchList = ref([])
-
+const whatRole = ()=> {
+    if(store.state.userFormInfo.level <= 4){
+        return '普通用户'
+    }else{
+        return '高能用户'
+    }
+    
+}
 const avatarHover = () => {
     // console.log(1)
     form.value = 'form formHover'
@@ -230,14 +237,18 @@ const howCollection = computed(()=>{
     }
 })
 onMounted(async ()=>{
-    // console.log(window.location.href)
+
 
    let arr1 = window.location.href.split('/')
-    // console.log(window.location.href.split('/')[arr1.length - 1])
     activeIndex.value=`/${window.location.href.split('/')[arr1.length - 1]}`
     userForm.value = store.state.userFormInfo
 
 })
+
+const handleCenter = ()=>{
+    router.push('/home/center')
+    activeIndex.value = null
+}
 
 </script>
 

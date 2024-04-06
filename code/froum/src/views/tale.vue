@@ -6,20 +6,20 @@
                 <el-icon>
                     <Grid />
                 </el-icon>
-                <span>综合</span>
+                <span> 综合</span>
 
             </div>
             <div :class="`select no-no ${selectWhich === 1 ? 'be-select' : ''}`" @click="handleSelect" data-id="1">
                 <el-icon>
                     <Ship />
                 </el-icon>
-                <span>自创故事</span>
+                <span> 自创故事</span>
             </div>
             <div :class="`select no-no ${selectWhich === 2 ? 'be-select' : ''}`" @click="handleSelect" data-id="2">
                 <el-icon>
                     <Link />
                 </el-icon>
-                <span>据事实改编</span>
+                <span> 据事实改编</span>
             </div>
 
             <div :class="`select no-no ${selectWhich === 3 ? 'be-select' : ''}`" @click="handleSelect" data-id="3">
@@ -27,27 +27,27 @@
                 <el-icon>
                     <Pear />
                 </el-icon>
-                <span>我有一个朋友</span>
+                <span> 我有一个朋友</span>
             </div>
 
             <div :class="`select no-no ${selectWhich === 4 ? 'be-select' : ''}`" @click="handleSelect" data-id="4">
                 <el-icon>
                     <Bicycle />
                 </el-icon>
-                <span>搬运</span>
+                <span> 搬运</span>
             </div>
             <div :class="`select no-no ${selectWhich === 5 ? 'be-select' : ''}`" @click="handleSelect" data-id="5">
                 <el-icon>
                     <Headset />
                 </el-icon>
-                我听说
+                <span> 我听说</span>
             </div>
 
             <div :class="`select yse-yse ${selectWhich === 6 ? 'yes-select' : ''}`" @click="handleSelect" data-id="6">
                 <el-icon>
                     <Warning />
                 </el-icon>
-                恐怖
+               <span> 恐怖</span>
             </div>
         </div>
         <div class='center'>
@@ -122,7 +122,7 @@
                 </div>
                 <div class="rightTwo-list-box">
                     
-                    <div v-for="item in hotForm" class="rightTwo-list-box-item"  @click="handleView(item.id)">
+                    <div v-for="item in hotForm" class="rightTwo-list-box-item"  @click="hotHandleView(item)">
                        <p class="rightTwo-list-box-item-top">
                          {{ item.title }}
                         </p>
@@ -165,7 +165,14 @@ let count = 1
 
 
 //有没有人点过赞 
+const hotHandleView = (item)=>{
+    if(item.isPost){
+        router.push(`/post-view/${item.id}`)
+    }else{
 
+        router.push(`/tale-view/${item.id}`)
+    }
+}
 const handleView = (id)=>{
     router.push(`/tale-view/${id}`)
 }

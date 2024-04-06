@@ -40,7 +40,7 @@ export default createStore({
       state.userFormInfo.toGoodPost  = JSON.parse(state.userFormInfo.toGoodPost)
      
     } 
-    console.log(state.userFormInfo.toGood ,'4',state.userFormInfo.toGoodPost)
+
     },
     changeUserMarckTime(state,marckTime){
       state.userFormInfo.marckTime = marckTime

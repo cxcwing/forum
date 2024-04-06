@@ -14,7 +14,7 @@
             <el-card class="card1" shadow="always">
                 <div class="left">
                     <el-avatar :size="110" :src="avatarUrl" />
-                    <span class="span-name">{{ '寸夕屮' }}</span>
+                    <span class="span-name">{{  userForm.username }}</span>
                     <span class="span-role">{{ '管理员' }}</span>
                 </div>
             </el-card>

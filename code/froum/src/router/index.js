@@ -6,7 +6,9 @@ import tale  from '../views/tale.vue'
 import mainBox from '../views/mainBox.vue'
 import taleView from '../views/tale-view.vue'
 import postView from '../views/post-view.vue'
-
+import Center from '@/components/center.vue'
+import homeCenter from '@/components/home/center.vue'
+import homeMessage from '@/components/home/message.vue'
 const routes = [
   {
     path: '/login',
@@ -21,7 +23,19 @@ const routes = [
       {
         path:'/home',
         name :'home',
-        component:home
+        component:home,
+        children:[
+          {
+            path:'/home/center',
+          name :'homeCenter',
+          component:homeCenter,
+        },
+        {
+          path:'/home/message',
+          name :'homeMessage',
+          component:homeMessage,
+        }
+        ]
       },
       {
         path:'/post',
