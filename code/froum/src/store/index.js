@@ -3,46 +3,56 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    massageIsShow:false,
-    userFormInfo:{},
-    taleList:[],
-    postList:[],
+    massageIsShow: false,
+    userFormInfo: {},
+    taleList: [],
+    postList: [],
   },
   getters: {
   },
   mutations: {
-    changeTaleList(state,taleList){
+    changeTaleList(state, taleList) {
       // console.log(taleList)
-      state.taleList= taleList
+      state.taleList = taleList
     },
-    changePostList(state,taleList){
+    changePostList(state, taleList) {
       // console.log(taleList)
-      state.postList= taleList
+      state.postList = taleList
     },
-    changeMassageIsShow(state,isShow){
+    changeMassageIsShow(state, isShow) {
       state.massageIsShow = isShow
-      
-    },
-    changeUserFormInfo(state,userForm){
 
-      state.userFormInfo={
+    },
+    changeUserFormInfo(state, userForm) {
+
+      state.userFormInfo = {
         ...state.userFormInfo,
         ...userForm
       }
-      
-      if(state.userFormInfo.toGood){
-  
-      state.userFormInfo.toGood  = JSON.parse(state.userFormInfo.toGood)
 
-    } 
-      if(state.userFormInfo.toGoodPost){
- 
-      state.userFormInfo.toGoodPost  = JSON.parse(state.userFormInfo.toGoodPost)
+      if (state.userFormInfo.toGood) {
+        try {
+          state.userFormInfo.toGood = JSON.parse(state.userFormInfo.toGood)
+      
+        } catch (e) {
+          console.log('')
+        }
      
-    } 
+
+      }
+      if (state.userFormInfo.toGoodPost) {
+        try {
+          state.userFormInfo.toGoodPost = JSON.parse(state.userFormInfo.toGoodPost)
+         
+        } catch (e) {
+          console.log('')
+        }
+    
+
+      }
 
     },
-    changeUserMarckTime(state,marckTime){
+    changeUserMarckTime(state, marckTime) {
       state.userFormInfo.marckTime = marckTime
     }
   },
@@ -51,7 +61,7 @@ export default createStore({
   modules: {
   },
   plugins: [createPersistedState({
-    paths:["userFormInfo"]
+    paths: ["userFormInfo"]
   })],
 })
 

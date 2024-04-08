@@ -148,8 +148,9 @@ const postForm = ref({})
 let count = 1
 
 
-//有没有人点过赞 
+
 const hotHandleView = (item)=>{
+ 
     if(item.isPost){
         router.push(`/post-view/${item.id}`)
     }else{
@@ -215,7 +216,7 @@ if (isCollOrtoke(postForm.value.whoGood, userId.value) === 1) {//删除
     let arrUser = store.state.userFormInfo.toGoodPost
     let index1 = arrLike.indexOf(userId.value)
     let index2 = arrUser.indexOf(postForm.value.id)
-    console.log()
+
     arrLike.splice(index1, 1)
     arrUser.splice(index2, 1)
     let form = {
@@ -226,9 +227,10 @@ if (isCollOrtoke(postForm.value.whoGood, userId.value) === 1) {//删除
     }
     let res = await axios.post(`/froumApi/froum/postLike`, form)
     if (res.data.ok) {
-        console.log(res.data)
+
         store.commit("changeUserFormInfo",res.data.data)
         postForm.value.whoGood = JSON.stringify(arrLike)
+        // console.log('aaaaaaa')
         postForm.value.goodNumber--
     }
 } else if (isCollOrtoke(postForm.value.whoGood, userId.value) === 2) {
@@ -268,9 +270,9 @@ if (isCollOrtoke(postForm.value.whoGood, userId.value) === 1) {//删除
         }
         let res = await axios.post(`/froumApi/froum/postLike`, form).then(res =>{
             console.log(res.data)
-            store.commit("changeUserFormInfo", res.data.data)
+            store.commit("changeUserFormInfo",res.data.data)
             postForm.value.whoGood = JSON.stringify(arrLike)
-            console.log()
+
             postForm.value.goodNumber --
         })
       

@@ -81,7 +81,7 @@ async function toGetTaleList(id) {
 }
 async function toMarck(_id, marckTime) {
     await sqlPool.query(`update users set power = power + 10 where _id=?`, [_id])
-    await sqlPool.query(`update users set marckTime=? where _id=?`, [marckTime, _id])
+    await sqlPool.query(`update users set marckTime=? ,level = power/200 where _id=?`, [marckTime, _id])
     let data = await sqlPool.query(`select * from users where _id = ?`, [_id])
     return data
 }
@@ -169,7 +169,29 @@ async function toGetThePost(id) {
     let res = await sqlPool.query(`select * from post where id=? and isPublish != 0`, [id])
     return res[0]
 }
-
+async function toUserUpdate(_id, username,   gender, introduction, avatar) {
+    if (avatar != '') {
+        await sqlPool.query(`update users set username=?,gender=?,introduction=?,avatar=? where _id=?`, [username, gender, introduction, avatar, _id])
+    } else {
+        await sqlPool.query(`update users set username=?,gender=?,introduction=? where _id=?`, [username,gender, introduction, _id])
+    }
+}
+async function  toGetLike(list){
+    let data = await sqlPool.query(`select * from tale where id in (?)`,[list])
+    return data[0]
+}
+async function  toGetLikePost(list){
+    let data = await sqlPool.query(`select * from Post where id in (?)`,[list])
+    return data[0]
+}
+async function  toGetCollection(list){
+    let data = await sqlPool.query(`select * from tale where id in (?)`,[list])
+    return data[0]
+}
+async function  toGetCollectionPost(list){
+    let data = await sqlPool.query(`select * from Post where id in (?)`,[list])
+    return data[0]
+}
 const froumController = {
     getPostList: async (req, res) => {
         let id = parseInt(req.query.id)
@@ -528,7 +550,7 @@ const froumController = {
         // console.log(req.query)
         let _id = parseInt(req.query.id)
         let marckTime = new Date()
-
+        
         let data = await toMarck(_id, marckTime.getTime())
         data = data[0][0]
         delete data.password
@@ -710,8 +732,103 @@ const froumController = {
             postList,
             taleList
         })
-    }
+    },
+    usersUpdate: async (req, res) => {
+        // console.log(req.body)
+        let { _id, username, gender, introduction } = req.body
+        // console.log(req.file)
+        _id = Number(_id)
+        // console.log(_id, username, gender, introduction)
+        let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ''
+        await toUserUpdate(_id, username,gender,introduction,avatar)
 
+        res.send({
+            ok: 1,
+            data: {
+                _id,
+                username,
+                gender,
+                introduction,
+                avatar
+            }
+        })
+    },
+    getLike:async (req,res)=>{
+    
+        if(req.body.toGood && req.body.toGood.length){
+
+           like = req.body.toGood
+        //    console.log(like.join(','))
+      
+            let searchRes = await toGetLike(like)
+         
+            res.send({
+                ok:1,
+                data:JSON.stringify(searchRes)
+            }) 
+        }else{
+            res.send({
+                ok:1,
+                data:JSON.stringify([])
+            })
+        }
+        
+    
+    },
+    getLikePost:async(req,res)=>{
+        if(req.body.toGoodPost){
+            let like = req.body.toGoodPost
+            let searchRes = await toGetLikePost(like)
+            console.log(searchRes.length)
+            res.send({
+                ok:1,
+                data:JSON.stringify(searchRes)
+            }) 
+        }else{
+            res.send({
+                ok:1,
+                data:JSON.stringify([])
+            })
+        }
+    },
+    getCollection:async (req,res)=>{
+    
+        if(req.body.Collection && req.body.collection.length){
+
+            Collection = req.body.collection
+        //    console.log(like.join(','))
+      
+            let searchRes = await toGetCollection(Collection)
+         
+            res.send({
+                ok:1,
+                data:JSON.stringify(searchRes)
+            }) 
+        }else{
+            res.send({
+                ok:1,
+                data:JSON.stringify([])
+            })
+        }
+        
+    
+    },
+    getCollectionPost:async(req,res)=>{
+        if(req.body.collectionPost){
+            let Collection = req.body.collectionPost
+            let searchRes = await toGetCollectionPost(Collection)
+            console.log(searchRes.length)
+            res.send({
+                ok:1,
+                data:JSON.stringify(searchRes)
+            }) 
+        }else{
+            res.send({
+                ok:1,
+                data:JSON.stringify([])
+            })
+        }
+    }
 }
 
 

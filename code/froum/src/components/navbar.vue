@@ -65,11 +65,11 @@
                                 <ArrowRight />
                             </el-icon>
                         </div>
-                        <div class="conBox goToBox">
+                        <div @click="handleController" class="conBox goToBox">
                             <el-icon>
                                 <EditPen />
                             </el-icon>
-                            <span class="goTo">创作管理</span>
+                            <span class="goTo" >创作管理</span>
 
                             <el-icon>
                                 <ArrowRight />
@@ -242,11 +242,15 @@ onMounted(async ()=>{
    let arr1 = window.location.href.split('/')
     activeIndex.value=`/${window.location.href.split('/')[arr1.length - 1]}`
     userForm.value = store.state.userFormInfo
-
 })
 
 const handleCenter = ()=>{
     router.push('/home/center')
+    activeIndex.value = null
+}
+
+const handleController = ()=>{
+    router.push('/controll/article-home')
     activeIndex.value = null
 }
 

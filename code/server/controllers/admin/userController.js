@@ -92,11 +92,7 @@ const UserController = {
         let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ""
         // console.log(avatar)
         await upload(_id, email, username, gender, introduction, avatar)
-        // let data = await test(_id,'寸夕屮')
-        // console.log(data)
-        // console.log(_id,token)
-        // console.log(req.file)
-        // console.log(req.body)
+
         if (avatar != '') {
 
             res.send({

@@ -34,7 +34,6 @@
   }
   
   const handleAvatarSuccess = (res, file) => {
-    console.log('1')
   }
   const beforeAvatarUpload = () => {
   

@@ -1,14 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import login from '../views/login.vue'
-import home  from '../views/home.vue'
-import post  from '../views/post.vue'
-import tale  from '../views/tale.vue'
+import home from '../views/home.vue'
+import post from '../views/post.vue'
+import tale from '../views/tale.vue'
 import mainBox from '../views/mainBox.vue'
 import taleView from '../views/tale-view.vue'
 import postView from '../views/post-view.vue'
 import Center from '@/components/center.vue'
 import homeCenter from '@/components/home/center.vue'
 import homeMessage from '@/components/home/message.vue'
+import controll from '@/views/controll.vue'
+import postList from '@/components/controll/postList.vue'
+import taleList from '@/components/controll/taleList.vue'
+import articleAdd from '@/components/controll/articleAdd.vue'
+import articleEdit from '@/components/controll/articleEdit.vue'
+import articleHome from '@/components/controll/articleHome.vue'
 const routes = [
   {
     path: '/login',
@@ -16,55 +22,87 @@ const routes = [
     component: login
   },
   {
-    path:'/mainBox',
-    name:'mainBox',
-    component:mainBox,
-    children:[
+    path: '/mainBox',
+    name: 'mainBox',
+    component: mainBox,
+    children: [
       {
-        path:'/home',
-        name :'home',
-        component:home,
-        children:[
+        path: '/home',
+        name: 'home',
+        component: home,
+        children: [
           {
-            path:'/home/center',
-          name :'homeCenter',
-          component:homeCenter,
-        },
-        {
-          path:'/home/message',
-          name :'homeMessage',
-          component:homeMessage,
-        }
+            path: '/home/center',
+            name: 'homeCenter',
+            component: homeCenter,
+          },
+          {
+            path: '/home/message',
+            name: 'homeMessage',
+            component: homeMessage,
+          }
         ]
       },
       {
-        path:'/post',
-        name:'post',
-        component:post
+        path: '/controll',
+        name: 'controll',
+        component: controll,
+        children: [
+          {
+            path:'/controll/article-home',
+            name:'articleHome',
+            component:articleHome
+          },
+          {
+            path: '/controll/postList',
+            name: 'postList',
+            component: postList
+          },
+          {
+            path: '/controll/taleList',
+            name: 'taleList',
+            component: taleList
+          },
+          {
+            path: '/controll/article-add',
+            name: 'articleAdd',
+            component: articleAdd
+          },
+          {
+            path: '/controll/article-edit',
+            name: 'articleEdd',
+            component: articleEdit
+          }
+        ]
       },
       {
-        path:'/tale',
-        name:'tale',
-  
-        component:tale
+        path: '/post',
+        name: 'post',
+        component: post
       },
       {
-        path:'/tale-view/:id',
-        name:'tale-view',
-        component:taleView
+        path: '/tale',
+        name: 'tale',
+        component: tale
       },
       {
-        path:'/post-view/:id',
-        name:'post-view',
-        component:postView
+        path: '/tale-view/:id',
+        name: 'tale-view',
+        component: taleView
       },
+      {
+        path: '/post-view/:id',
+        name: 'post-view',
+        component: postView
+      },
+
     ]
 
   },
 
   {
-    path:'/',
-    redirect:'/tale'
+    path: '/',
+    redirect: '/tale'
   }
 
 

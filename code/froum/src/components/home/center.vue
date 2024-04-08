@@ -31,160 +31,152 @@
             </div>
 
         </div>
+
         <div class="center-two">
-            <div class="center-two-title">
-                <h3>创作数据</h3>
-            </div>
-            <div class="center-two-post">
-                <div class="center-two-post-h4">
-
-                    <h4>
-                        <el-icon>
-                            <Tickets />
-                        </el-icon>
-                        贴子图表
-                    </h4>
-                </div>
-                <div class="center-two-post-chartBox">
-                    <div class="center-two-post-MyPostChart" ref="MyPostChart">
+            <el-card>
+                <div class="sortBox">
+                    <div class="sort">
+                        <span :class="`sort-one ${howSort === 0 ? 'active' : ''}`" @click="sortSelect"
+                            data-id="0">点赞</span>
+                        <span :class="`sort-two ${howSort === 1 ? 'active' : ''}`" @click="sortSelect"
+                            data-id="1">收藏</span>
 
                     </div>
-                    <div class="center-two-post-MyPostChart" ref="MyPostChart2">
+                </div>
+                <div class="listBox">
 
+                    <div class='center'>
+
+                        <ul v-if="articleList.length" class="infinite-list" style="overflow: auto">
+                            <li v-for="item in articleList" :key="item.id" @click="handleView(item)"
+                                class="infinite-list-item list-item">
+                                <div class="border-bottom">
+                                    <div class='content-item'>
+                                        <div class="title">
+                                            {{ item.title }}
+                                        </div>
+                                        <div class="content">
+                                            {{ contentValue(item.content) }}
+                                        </div>
+                                        <div class="good">
+                                            <div class="head">
+                                                <div class="goodFirst">{{ item.author }}</div>
+                                                <div class="eyseBox">
+                                                    <el-icon class="eyse">
+                                                        <View />
+                                                    </el-icon> {{ item.lookNumber }}
+                                                </div>
+
+                                                <div :class="`likeBox beLiked`" :data-id="item.id">
+
+                                                    <el-icon :class="`like`">
+                                                        <MagicStick />
+                                                    </el-icon>
+                                                    {{ item.goodNumber }}
+                                                </div>
+
+                                            </div>
+
+                                            <div class="after">
+                                                <span>{{ whatType(item.type) }}</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="coverBox">
+                                        <div class="image"
+                                            :style="'background-image:url(http://localhost:3000' + `${item.cover}` + ');'">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div v-else> <el-empty :image-size="200" description="暂无此类型，快来创作吧！" /></div>
                     </div>
 
-                </div>
-            </div>
 
-            <div class="center-two-tale">
-                <div class="center-two-post-h4">
-
-                    <h4>
-                        <el-icon>
-                            <Notebook />
-                        </el-icon>
-                        故事图表
-                    </h4>
-                </div>
-
-                <div class="center-two-post-chartBox">
-                    <div class="center-two-post-MyPostChart" ref="MyTaleChart">
-
-                    </div>
-                    <div class="center-two-post-MyPostChart" ref="MyTaleChart2">
-
-                    </div>
 
                 </div>
-
-            </div>
+            </el-card>
         </div>
 
     </div>
 </template>
 
 <script setup>
-import { Tickets,Notebook } from '@element-plus/icons-vue'
+import { Tickets, Notebook } from '@element-plus/icons-vue'
 import { useStore } from 'vuex';
-import {  ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import option from '../../../util/echartsInit';
 import * as echarts from 'echarts'
+import { MagicStick, View } from '@element-plus/icons-vue'
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute()
+const router = useRouter()
 const store = useStore()
 const userForm = ref(store.state.userFormInfo)
 const percentage = ref(0)
-const MyPostChart = ref(null)
-const MyPostChart2 = ref(null)
-const MyTaleChart = ref(null)
-const MyTaleChart2 = ref(null)
-const postData = ref([ //
-    { value: 0, name: "无事水水" },
-    { value: 0, name: "游戏相关" },
-    { value: 0, name: "趣事分享" },
-    { value: 0, name: "意见征集" },
-    { value: 0, name: "求助" }
-],)
-const taleData = ref([ //
-    { value: 0, name: "非恐怖" },
-    { value: 0, name: "自创故事" },
-    { value: 0, name: "据事实改编" },
-    { value: 0, name: "我有一个朋友" },
-    { value: 0, name: "搬运" },
-    { value: 0, name: "我听说" },
-    { value: 0, name: "恐怖" }
-],)
-
-const randerPost = (res2)=>{
-    let postList = res2.data.postList
-      
-        let postLookNumber = 0
-        let postGoodNumber = 0
-        let postCollectionNumber = 0
+const articleList = ref([])
+const howSort = ref(0)
+const contentValue = (content) => {
+    let rm = /<(\w+)(?:\s+[^>]+)?>|<\/\w+>/g
+    let str1 = content.replace(rm, '')
+    str1 = str1.replace(rm, '')
+    str1 = str1.replace(/&nbsp;/g, '')
+    return str1.substring(0, 100)
+}
+const getList =async (taleLink,postLink)=>{
+    let res = await axios.get(`/froumApi/froum/getUser?id=${userForm.value._id}`)
+    if (res.data.ok) {
+        store.commit("changeUserFormInfo", res.data.data)
+        userForm.value = store.state.userFormInfo
+        percentage.value = parseFloat((store.state.userFormInfo.power - store.state.userFormInfo.level * 200) / 200 * 100)
+    } else {
+    }
+    let res2 = await axios.post(taleLink, userForm.value)
+    let res3 = await axios.post(postLink,userForm.value)
+    if (res2.data.ok && res3.data.ok) {
+        let arr2 = JSON.parse(res2.data.data)
+        let arr3 = JSON.parse(res3.data.data)
+        articleList.value = [...arr2,...arr3]
    
-        for (let item of postList) {
-            postLookNumber += item.lookNumber
-            if (item.whoGood) {
-                postGoodNumber += item.whoGood.length
-            }
-            if (item.whoCollection) {
-                postCollectionNumber += item.whoCollection.length
-            }
-            postData.value[item.type].value++
+    } else {
 
-        }
-        randerPostData()
-        randerPostGoodData(postLookNumber, postGoodNumber, postCollectionNumber)
-}
-
-const randerPostGoodData = (postLookNumberpost, postGoodNumber, CollectionNumber) => {
-    if (MyPostChart2.value) {
-        MyPostChart2.value = echarts.init(MyPostChart2.value)
-        MyPostChart2.value.setOption(option.MyPostChart2(postLookNumberpost, postGoodNumber, CollectionNumber))
     }
 }
-const randerPostData = () => {
-    if (MyPostChart.value) {
-        MyPostChart.value = echarts.init(MyPostChart.value)
-        MyPostChart.value.setOption(option.MyPostChart(postData.value));
+const whatType = (type) => {
+    if (type === 0) {
+        return "非恐怖"
+    }
+    else if (type === 1) {
+        return "自创故事"
+    }
+    else if (type === 2) {
+        return "据事实改编"
+    }
+    else if (type === 3) {
+        return "我有一个朋友"
+    }
+    else if (type === 4) {
+        return "搬运"
+    }
+    else if (type === 5) {
+        return "我听说"
+    }
+    else if (type === 6) {
+        return "恐怖"
     }
 }
+const handleView = (item) => {
 
+    if (item.isPost) {
+        router.push(`/post-view/${item.id}`)
+    } else {
 
-const randerTale = (res2)=>{
-  
-        let taleList = res2.data.taleList
-
-        let TaleLookNumber = 0
-        let TaleGoodNumber = 0
-        let TaleCollectionNumber = 0
-
-        for (let item of taleList) {
-            TaleLookNumber += item.lookNumber
-            if (item.whoGood) {
-                TaleGoodNumber += item.whoGood.length
-            }
-            if (item.whoCollection) {
-                TaleCollectionNumber += item.whoCollection.length
-            }
-            taleData.value[item.type].value++
-
-        }
-        console.log(TaleLookNumber, TaleGoodNumber, TaleCollectionNumber)
-
-        randerTaleData()
-        randerTaleGoodData(TaleLookNumber, TaleGoodNumber, TaleCollectionNumber)
-}
-
-const randerTaleGoodData = (TaleLookNumber, TaleGoodNumber, TaleCollectionNumber) => {
-    if (MyTaleChart2.value) {
-        MyTaleChart2.value = echarts.init(MyTaleChart2.value)
-        MyTaleChart2.value.setOption(option.MyTaleChart2(TaleLookNumber, TaleGoodNumber, TaleCollectionNumber))
-    }
-}
-const randerTaleData = ()=>{
-    if(MyTaleChart.value){
-        MyTaleChart.value = echarts.init(MyTaleChart.value)
-        MyTaleChart.value.setOption(option.MyTaleChart(taleData.value))
+        router.push(`/tale-view/${item.id}`)
     }
 }
 
@@ -196,39 +188,29 @@ const whatRole = () => {
     }
 
 }
+const sortSelect =async (evt) =>{
+    // console.log(evt.currentTarget.dataset.id)
+    howSort.value = parseInt(evt.currentTarget.dataset.id)
+
+    if(howSort.value === 0){
+        await getList(`/froumApi/froum/getLike`,`/froumApi/froum/getLikePost`)
+    }else if(howSort.value ===1){
+        await getList(`/froumApi/froum/getCollection`,`/froumApi/froum/getCollectionPost`)
+    }
+}
 
 onMounted(async () => {
 
 
-
     percentage.value = parseFloat((store.state.userFormInfo.power - store.state.userFormInfo.level * 200) / 200 * 100)
-    // let level = power % 100
-    let res = await axios.get(`/froumApi/froum/getUser?id=${userForm.value._id}`)
-    if (res.data.ok) {
-
-        store.commit("changeUserFormInfo", res.data.data)
-        // console.log(res.data.data)
-        userForm.value = store.state.userFormInfo
-
-    } else {
-
-    }
-    let res2 = await axios.get(`/froumApi/froum/getUserArticle?id=${userForm.value._id}`)
-    if (res2.data.ok) {
-
-        randerPost(res2)
-        randerTale(res2)
-    } else {
-
-    }
+    await getList(`/froumApi/froum/getLike`,`/froumApi/froum/getLikePost`)
 })
-
 
 
 
 </script>
 
-<style setup>
+<style scoped>
 .center-one-right-userbox-username {
     color: #18dc00;
     font-weight: 600;
@@ -276,45 +258,11 @@ onMounted(async () => {
     border-radius: 30px 30px 30px 0px;
 }
 
-.center-two-post-chartBox {
-    display: flex;
-    max-width: 100%;
-}
-
-.center-two-post-h4 {
-    margin-top: 30px;
-    margin-left: 40px;
-    margin-bottom: 30px;
-    height: 40px;
-    line-height: 40px;
-
-}
-
-.center-two-post {
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgb(204, 204, 204);
-}
-
-
-.center-two-post-MyPostChart {
-    flex: 1;
-}
-
-/* .center-one-right-progress-box-right::before{
-    width: 10px;
-    height: 10px;
-    content: '';
-
-    background-color: #ffffff;
-    z-index: 5;
-    position: absolute;
-  
-} */
 .center-one {
     display: flex;
     margin-bottom: 10px;
-    border-bottom: 1px solid rgba(90, 90, 90, 0.137);
-
+    border-bottom: 1px solid rgba(123, 123, 123, 0.321);
+    /* background-color: red; */
 }
 
 .center-one-left {
@@ -334,5 +282,245 @@ onMounted(async () => {
 .center-two-post-MyPostChart {
     width: 300px;
     height: 300px;
+}
+
+
+
+
+
+
+.el-icon.eyse {
+    padding-right: 0;
+    margin: 0;
+    margin-top: 2px;
+    margin-right: 5px;
+}
+
+.eyseBox {
+    height: 16px;
+    line-height: 16px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    margin-right: 20px;
+}
+
+.el-icon[data-v-76f4c0c0] {
+    padding: 0;
+}
+
+.likeBox {
+    height: 16px;
+    line-height: 16px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+}
+
+.like {
+    padding: 0;
+    margin: 2px;
+    font-size: 16px;
+
+}
+
+.likeBox:hover {
+    color: rgb(24, 220, 2);
+}
+
+.beLiked {
+    color: rgb(24, 220, 2);
+}
+
+
+
+
+
+.active {
+    color: black;
+}
+
+
+
+.title {
+    font-size: 16px;
+    font-weight: 700;
+    flex: 1;
+
+}
+
+.content {
+    color: #8A919F;
+    font-size: 13px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.head {
+    display: flex;
+    flex-direction: row;
+}
+
+.goodFirst {
+    padding-right: 5px;
+    position: relative;
+    margin-right: 8px;
+}
+
+.goodFirst::before {
+    content: '';
+    width: 2px;
+    height: 12px;
+    /* background-color: #0055ff; */
+    position: absolute;
+    right: -2px;
+    top: 3px;
+    border-right: 1px #8a919f76 solid;
+}
+
+.good {
+    flex: 1;
+    font-size: 13px;
+    color: #8A919F;
+    display: flex;
+    justify-content: space-between;
+    /* height: 10px; */
+
+}
+
+.after {
+    color: #8A919F;
+    font-size: 12px;
+
+}
+
+.after>span {
+    background-color: #cdced060;
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+.after:hover {
+    color: rgba(24, 220, 2, 0.914);
+}
+
+.image {
+    height: 80px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.border-bottom {
+    display: flex;
+    border-bottom: 1px solid #8a919f24;
+}
+
+.list-item {
+    padding-top: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor: pointer;
+}
+
+.list-item:hover {
+    background-color: #8a919f0c;
+}
+
+.content-item {
+    display: flex;
+    flex-direction: column;
+    flex: 13;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.coverBox {
+    border-radius: 3px;
+    flex: 3;
+}
+
+.el-icon {
+    /* box-sizing: border-box; */
+    padding-right: 10px;
+}
+
+
+
+.center {
+    margin-top: 20px;
+    background-color: rgb(255, 255, 255);
+    margin-left: 15px;
+    border-radius: 8px;
+    margin-right: 15px;
+    max-width: 95%;
+}
+
+
+
+.first>span {
+    margin-bottom: 2px;
+}
+.sortBox {
+    border-bottom: #8a919f4a 1px solid;
+    padding: 12px;
+    font-size: 17px;
+    color: #8a919f;
+
+}
+.sort-one {
+    padding-right: 40px;
+    padding-left: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.sort-two {
+    padding-right: 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+.sort-one:hover {
+    color: rgb(24, 220, 2);
+}
+
+.sort-two:hover {
+    color: rgb(24, 220, 2);
+}
+.active {
+    color: black;
+}
+
+.sort-one.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 15px;
+    background-color: rgba(24, 220, 2, 0.914);
+}
+
+.sort-two.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 5px;
+    background-color: rgba(24, 220, 2, 0.914);
 }
 </style>

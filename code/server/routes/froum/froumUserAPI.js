@@ -39,4 +39,10 @@ let createFolder = function(folder) {
  FroumUserRouter.get("/froumApi/froum/getUser",FroumController.getUser)
  FroumUserRouter.get("/froumApi/froum/getUserArticle",FroumController.getUserArticle)
 
+ FroumUserRouter.post("/froumApi/froum/usersUpdate",upload.single('file'),FroumController.usersUpdate)
+ FroumUserRouter.post("/froumApi/froum/getLike",FroumController.getLike)
+ FroumUserRouter.post("/froumApi/froum/getLikePost",FroumController.getLikePost)
+ FroumUserRouter.post("/froumApi/froum/getCollection",FroumController.getCollection)
+ FroumUserRouter.post("/froumApi/froum/getCollectionPost",FroumController.getCollectionPost)
+
 module.exports = FroumUserRouter

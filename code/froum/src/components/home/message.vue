@@ -15,9 +15,9 @@
 
                     <el-form-item :size="'large'" label="性别" prop="region">
                         <el-select v-model="userForm.gender" placeholder="Activity zone" class="sel">
-                            <el-option label="保密" :value="0" />
-                            <el-option label="男" :value="1" />
-                            <el-option label="女" :value="2" />
+                            <el-option label="保密" value="0" />
+                            <el-option label="男" value="1" />
+                            <el-option label="女" value="2" />
                         </el-select>
                     </el-form-item>
                     <el-form-item label="个人介绍" prop="introduction">
@@ -46,10 +46,11 @@ onMounted(() => {
 
 })
 
-const { username, email, avatar, gender, introduction } = store.state.userFormInfo
+let { _id,username,  avatar, gender, introduction } = store.state.userFormInfo
+gender = String(gender)
 const userForm = ref({
     username,
-    email,
+    _id,
     avatar,
     gender,
     introduction,
@@ -62,17 +63,13 @@ const avatarUrl = computed(() =>
 
 const ruleFormRef = ref()
 
-console.log(userForm.value)
+
 
 const rules = reactive({
     username: [
         { required: true, message: '输入用户名', trigger: 'blur' },
 
     ],
-    email: [
-        { required: true, message: '请输入邮箱', trigger: 'blur' },
-
-    ]
 })
 
 
@@ -85,18 +82,15 @@ const handleChange = (file) => {
 }
 
 const handleSubmit = () => {
-    // console.log(userForm.value)
+  
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
-            // console.log("OK")
-            // console.log(userForm.value)
+ 
             let obj = {
                 ok: 1
             }
-            // axios.post(`/adminApi/user/Update`,obj).then(res=>{
-            //     console.log(res.data)
-            // })
-            const res = await upLoad(`/adminApi/user/Update`, userForm.value)
+
+            const res = await upLoad(`/froumApi/froum/usersUpdate`, userForm.value)
             if (res.data.ok) {
             
                 userForm.value = {

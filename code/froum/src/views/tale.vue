@@ -177,7 +177,7 @@ const handleView = (id)=>{
     router.push(`/tale-view/${id}`)
 }
 const whatType = (type)=>{
-    if(type ===0 ){
+    if(type === 0 ){
         return "非恐怖" 
     }
     else if(type === 1){
@@ -288,7 +288,7 @@ if (isCollOrtoke(taleForm.value.whoGood, userId.value) === 1) {//删除
             userId: userId.value
         }
         let res = await axios.post(`/froumApi/froum/like`, form).then(res =>{
-            console.log(res.data)
+
             store.commit("changeUserFormInfo", res.data.data)
             taleForm.value.whoGood = JSON.stringify(arrLike)
             taleForm.value.goodNumber --
