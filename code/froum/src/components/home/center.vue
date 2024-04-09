@@ -40,14 +40,16 @@
                             data-id="0">点赞</span>
                         <span :class="`sort-two ${howSort === 1 ? 'active' : ''}`" @click="sortSelect"
                             data-id="1">收藏</span>
-
+                        <el-input v-model="centerSearch" style="width: 300px" size="large" placeholder="搜索"
+                            :suffix-icon="Search" @input="centerSearchInput" />
                     </div>
                 </div>
                 <div class="listBox">
 
                     <div class='center'>
 
-                        <ul v-if="articleList.length" class="infinite-list" style="overflow: auto">
+                        <ul v-if="articleList.length && !searchList.length" class="infinite-list"
+                            style="overflow: auto">
                             <li v-for="item in articleList" :key="item.id" @click="handleView(item)"
                                 class="infinite-list-item list-item">
                                 <div class="border-bottom">
@@ -78,7 +80,7 @@
                                             </div>
 
                                             <div class="after">
-                                                <span>{{ whatType(item.type) }}</span>
+                                                <span>{{ whatType(item) }}</span>
                                             </div>
 
                                         </div>
@@ -92,7 +94,56 @@
                                 </div>
                             </li>
                         </ul>
-                        <div v-else> <el-empty :image-size="200" description="暂无此类型，快来创作吧！" /></div>
+
+
+                        <ul v-else-if="searchList.length" class="infinite-list"
+                            style="overflow: auto">
+                            <li v-for="item in searchList" :key="item.id" @click="handleView(item)"
+                                class="infinite-list-item list-item">
+                                <div class="border-bottom">
+                                    <div class='content-item'>
+                                        <div class="title">
+                                            {{ item.title }}
+                                        </div>
+                                        <div class="content">
+                                            {{ contentValue(item.content) }}
+                                        </div>
+                                        <div class="good">
+                                            <div class="head">
+                                                <div class="goodFirst">{{ item.author }}</div>
+                                                <div class="eyseBox">
+                                                    <el-icon class="eyse">
+                                                        <View />
+                                                    </el-icon> {{ item.lookNumber }}
+                                                </div>
+
+                                                <div :class="`likeBox beLiked`" :data-id="item.id">
+
+                                                    <el-icon :class="`like`">
+                                                        <MagicStick />
+                                                    </el-icon>
+                                                    {{ item.goodNumber }}
+                                                </div>
+
+                                            </div>
+
+                                            <div class="after">
+                                                <span>{{ whatType(item) }}</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="coverBox">
+                                        <div class="image"
+                                            :style="'background-image:url(http://localhost:3000' + `${item.cover}` + ');'">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div v-else> <el-empty :image-size="200" description="空空如也，快去寻找心仪的文章吧" /></div>
                     </div>
 
 
@@ -114,13 +165,31 @@ import * as echarts from 'echarts'
 import { MagicStick, View } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router';
 
+
+const howSort = ref(0)
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const userForm = ref(store.state.userFormInfo)
 const percentage = ref(0)
 const articleList = ref([])
-const howSort = ref(0)
+const searchList = ref([])
+const centerSearch = ref('')
+const centerSearchInput = () => {
+
+
+    if (centerSearch.value !='') {
+        // console.log(centerSearch.value)
+        searchList.value = articleList.value.filter(item => {
+           
+            
+            return item.title.includes(centerSearch.value)
+        })
+        console.log(searchList.value)
+    }else{
+        searchList.value = []
+    }
+}
 const contentValue = (content) => {
     let rm = /<(\w+)(?:\s+[^>]+)?>|<\/\w+>/g
     let str1 = content.replace(rm, '')
@@ -128,7 +197,7 @@ const contentValue = (content) => {
     str1 = str1.replace(/&nbsp;/g, '')
     return str1.substring(0, 100)
 }
-const getList =async (taleLink,postLink)=>{
+const getList = async (taleLink, postLink) => {
     let res = await axios.get(`/froumApi/froum/getUser?id=${userForm.value._id}`)
     if (res.data.ok) {
         store.commit("changeUserFormInfo", res.data.data)
@@ -137,37 +206,54 @@ const getList =async (taleLink,postLink)=>{
     } else {
     }
     let res2 = await axios.post(taleLink, userForm.value)
-    let res3 = await axios.post(postLink,userForm.value)
+    let res3 = await axios.post(postLink, userForm.value)
     if (res2.data.ok && res3.data.ok) {
         let arr2 = JSON.parse(res2.data.data)
         let arr3 = JSON.parse(res3.data.data)
-        articleList.value = [...arr2,...arr3]
-   
+        articleList.value = [...arr2, ...arr3]
+
     } else {
 
     }
 }
-const whatType = (type) => {
-    if (type === 0) {
-        return "非恐怖"
-    }
-    else if (type === 1) {
-        return "自创故事"
-    }
-    else if (type === 2) {
-        return "据事实改编"
-    }
-    else if (type === 3) {
-        return "我有一个朋友"
-    }
-    else if (type === 4) {
-        return "搬运"
-    }
-    else if (type === 5) {
-        return "我听说"
-    }
-    else if (type === 6) {
-        return "恐怖"
+const whatType = (item) => {
+
+    let type = item.type
+
+    if (item.isPost) {
+      if(type === 0){
+        return "无事水水"
+      }else if(type === 1){
+        return "趣事分享"
+      }else if(type === 2){
+        return "游戏相关"
+      }else if(type === 3){
+        return "意见征集"
+      }else if(type === 4){
+        return "求助"
+      }
+    } else {
+        if (type === 0) {
+            return "非恐怖"
+        }
+        else if (type === 1) {
+            return "自创故事"
+        }
+        else if (type === 2) {
+            return "据事实改编"
+        }
+        else if (type === 3) {
+            return "我有一个朋友"
+        }
+        else if (type === 4) {
+            return "搬运"
+        }
+        else if (type === 5) {
+            return "我听说"
+        }
+        else if (type === 6) {
+            return "恐怖"
+        }
     }
 }
 const handleView = (item) => {
@@ -188,14 +274,15 @@ const whatRole = () => {
     }
 
 }
-const sortSelect =async (evt) =>{
+const sortSelect = async (evt) => {
     // console.log(evt.currentTarget.dataset.id)
+    searchList.value = []
     howSort.value = parseInt(evt.currentTarget.dataset.id)
 
-    if(howSort.value === 0){
-        await getList(`/froumApi/froum/getLike`,`/froumApi/froum/getLikePost`)
-    }else if(howSort.value ===1){
-        await getList(`/froumApi/froum/getCollection`,`/froumApi/froum/getCollectionPost`)
+    if (howSort.value === 0) {
+        await getList(`/froumApi/froum/getLike`, `/froumApi/froum/getLikePost`)
+    } else if (howSort.value === 1) {
+        await getList(`/froumApi/froum/getCollection`, `/froumApi/froum/getCollectionPost`)
     }
 }
 
@@ -203,7 +290,7 @@ onMounted(async () => {
 
 
     percentage.value = parseFloat((store.state.userFormInfo.power - store.state.userFormInfo.level * 200) / 200 * 100)
-    await getList(`/froumApi/froum/getLike`,`/froumApi/froum/getLikePost`)
+    await getList(`/froumApi/froum/getLike`, `/froumApi/froum/getLikePost`)
 })
 
 
@@ -469,6 +556,7 @@ onMounted(async () => {
 .first>span {
     margin-bottom: 2px;
 }
+
 .sortBox {
     border-bottom: #8a919f4a 1px solid;
     padding: 12px;
@@ -476,6 +564,7 @@ onMounted(async () => {
     color: #8a919f;
 
 }
+
 .sort-one {
     padding-right: 40px;
     padding-left: 10px;
@@ -487,6 +576,7 @@ onMounted(async () => {
     padding-right: 20px;
     cursor: pointer;
     position: relative;
+    margin-right: 100px;
 }
 
 .sort-one:hover {
@@ -496,6 +586,7 @@ onMounted(async () => {
 .sort-two:hover {
     color: rgb(24, 220, 2);
 }
+
 .active {
     color: black;
 }

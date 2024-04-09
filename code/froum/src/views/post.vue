@@ -111,7 +111,7 @@
                          {{ item.title }}
                         </p>
                        <div class="rightTwo-list-box-item-bottom"> 
-                        <spam>{{ item.lookNumber }} 阅读</spam>
+                        <spam class="read">{{ item.lookNumber }} 阅读</spam>
                         <spam>{{ item.goodNumber }} 点赞</spam>
 
                        </div>
@@ -273,7 +273,7 @@ if (isCollOrtoke(postForm.value.whoGood, userId.value) === 1) {//删除
             store.commit("changeUserFormInfo",res.data.data)
             postForm.value.whoGood = JSON.stringify(arrLike)
 
-            postForm.value.goodNumber --
+            postForm.value.goodNumber ++
         })
       
 }
@@ -764,5 +764,8 @@ onUnmounted(() => {
 .yes-select {
     background-color: rgba(190, 17, 17, 0.241);
     color: rgb(191, 14, 14);
+}
+.read{
+    margin-right: 20px;
 }
 </style>

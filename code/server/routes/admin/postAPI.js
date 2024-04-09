@@ -26,10 +26,11 @@ let createFolder = function(folder) {
   })
   let upload = multer({ storage: storage })
 
-  PostRouter.post(`/adminApi/post/postAdd`,upload.single('file'),postController.postAdd)
   PostRouter.get(`/adminApi/post/getPostList`,postController.getPostList)
   PostRouter.put(`/adminApi/post/updateIsPublish`,postController.changePublish)
+
   PostRouter.get(`/adminApi/post/getThisPost`,postController.getThisPost)
+  PostRouter.post(`/adminApi/post/postAdd`,upload.single('file'),postController.postAdd)
   PostRouter.post(`/adminApi/post/postUpdate`,upload.single('file'),postController.postUpdate)
   PostRouter.delete(`/adminApi/post/postDelete`,postController.postDelete)
    

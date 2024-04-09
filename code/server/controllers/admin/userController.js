@@ -172,7 +172,7 @@ const UserController = {
         })
     },
     imageAdd: (req, res) => {
-        // console.log('aaaa')
+    
         // console.log(req.file)
         let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
         res.send({

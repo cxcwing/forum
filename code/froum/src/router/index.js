@@ -6,13 +6,14 @@ import tale from '../views/tale.vue'
 import mainBox from '../views/mainBox.vue'
 import taleView from '../views/tale-view.vue'
 import postView from '../views/post-view.vue'
-import Center from '@/components/center.vue'
+
 import homeCenter from '@/components/home/center.vue'
 import homeMessage from '@/components/home/message.vue'
 import controll from '@/views/controll.vue'
 import postList from '@/components/controll/postList.vue'
 import taleList from '@/components/controll/taleList.vue'
-import articleAdd from '@/components/controll/articleAdd.vue'
+import postAdd from '@/components/controll/postAdd.vue'
+import taleAdd from '@/components/controll/taleAdd.vue'
 import articleEdit from '@/components/controll/articleEdit.vue'
 import articleHome from '@/components/controll/articleHome.vue'
 const routes = [
@@ -64,12 +65,17 @@ const routes = [
             component: taleList
           },
           {
-            path: '/controll/article-add',
-            name: 'articleAdd',
-            component: articleAdd
+            path: '/controll/tale-add',
+            name: 'taleAdd',
+            component: taleAdd
           },
           {
-            path: '/controll/article-edit',
+            path: '/controll/post-add',
+            name: 'postAdd',
+            component: postAdd
+          },
+          {
+            path: '/controll/article-edit/:id/:isPost',
             name: 'articleEdd',
             component: articleEdit
           }

@@ -33,6 +33,7 @@ async function toGetThisTale(id){
 async function toTaleUpdate(id,title,type,content,author,authorId,time,cover){
     await sqlPool.query(`update tale set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`,[title,type,content,author,authorId,time,cover,id])
 }
+
 async function toTaleDelete(id){
     await sqlPool.query(`delete from tale where id = ?`,[id])
 }
@@ -60,7 +61,7 @@ const taleController = {
         })
     },
     changePublish:async (req,res) =>{
-        console.log(req.body.id,req.body.isPublish)
+
         await toChangePublish(req.body.id,req.body.isPublish)
         res.send({
             ok:1 

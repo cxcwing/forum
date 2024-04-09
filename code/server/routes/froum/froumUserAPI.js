@@ -29,7 +29,7 @@ let createFolder = function(folder) {
  FroumUserRouter.post("/froumApi/froum/collection",FroumController.collection)
 
  FroumUserRouter.post("/froumApi/froum/commentUpdate",FroumController.commentUpdate)
-
+ 
  FroumUserRouter.post("/froumApi/froum/postLike",FroumController.postLike)
 
  FroumUserRouter.post("/froumApi/froum/collectionPost",FroumController.collectionPost)
@@ -44,5 +44,24 @@ let createFolder = function(folder) {
  FroumUserRouter.post("/froumApi/froum/getLikePost",FroumController.getLikePost)
  FroumUserRouter.post("/froumApi/froum/getCollection",FroumController.getCollection)
  FroumUserRouter.post("/froumApi/froum/getCollectionPost",FroumController.getCollectionPost)
+ 
+ FroumUserRouter.get("/froumApi/froum/getUserPost",FroumController.getUserPost)
+ FroumUserRouter.delete("/froumApi/froum/deleteUserPost",FroumController.deleteUserPost)
+
+ FroumUserRouter.get("/froumApi/froum/getUserTale",FroumController.getUserTale)
+ FroumUserRouter.delete("/froumApi/froum/deleteUserTale",FroumController.deleteUserTale)
+
+
+ FroumUserRouter.post(`/froumApi/froum/addUserPost`,upload.single('file'),FroumController.addUserPost)
+ FroumUserRouter.post(`/froumApi/froum/addUserTale`,upload.single('file'),FroumController.addUserTale)
+ FroumUserRouter.post(`/froumApi/froum/imageAdd`,upload.single('upload'),FroumController.imageAdd)
+
+ FroumUserRouter.post(`/froumApi/froum/postUpdate`,upload.single('file'),FroumController.postUpdate)
+ FroumUserRouter.post(`/froumApi/froum/taleUpdate`,upload.single('file'),FroumController.taleUpdate)
+
+//  FroumUserRouter.post(`/froumApi/froum/updateUserPost`,upload.single('file'),postController.postUpdate)
+//  FroumUserRouter.delete(`/froumApi/froum/`,postController.postDelete)
+
+ 
 
 module.exports = FroumUserRouter

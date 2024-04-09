@@ -2,6 +2,8 @@ const mysql = require('mysql2')
 const JWT = require("../../util/JWT.js")
 const nodemailer = require("nodemailer");
 const { search } = require('../../app.js');
+const { imageAdd } = require('../admin/userController.js');
+
 const mailerConfig = {
     host: 'smtp.163.com',
     secureConnection: true,
@@ -45,7 +47,7 @@ const sqlPool = mysql.createPool({
 
 const transporter = nodemailer.createTransport(mailerConfig)
 async function saveCaptcha(idCode, createtime, email) {
-    console.log(createtime)
+  
     await sqlPool.query(`insert into token (idCode,createtime,email) values (?,?,?)`, [idCode, createtime, email])
 }
 async function searchCaptcha(captcha, email) {
@@ -124,7 +126,7 @@ async function toCommentUpdate(textId, content, userId, userName, userAvatar) {
     await sqlPool.query(`update tale set Comment = Comment + 1 where id=?`, [textId])
 
 }
-async function toCommentUpdate(textId, content, userId, userName, userAvatar) {
+async function toCommentUpdatePost(textId, content, userId, userName, userAvatar) {
     await sqlPool.query(`insert into comment (postId,content,userId,userName,userAvatar) values (?,?,?,?,?)`, [textId, content, userId, userName, userAvatar])
     await sqlPool.query(`update post set Comment = Comment + 1 where id=?`, [textId])
 
@@ -152,16 +154,16 @@ async function toGetAllTale() {
 }
 
 async function toGetPostList(id) {
-  
-    if(id === 100){
+
+    if (id === 100) {
 
         let data = await sqlPool.query(`select * from post where isPublish != 0`)
         return data[0]
-    }else{
-        let data = await sqlPool.query(`select * from post where type=? and isPublish != 0`,[id])
+    } else {
+        let data = await sqlPool.query(`select * from post where type=? and isPublish != 0`, [id])
         return data[0]
     }
-  
+
 
 }
 async function toGetThePost(id) {
@@ -169,29 +171,63 @@ async function toGetThePost(id) {
     let res = await sqlPool.query(`select * from post where id=? and isPublish != 0`, [id])
     return res[0]
 }
-async function toUserUpdate(_id, username,   gender, introduction, avatar) {
+async function toUserUpdate(_id, username, gender, introduction, avatar) {
     if (avatar != '') {
         await sqlPool.query(`update users set username=?,gender=?,introduction=?,avatar=? where _id=?`, [username, gender, introduction, avatar, _id])
     } else {
-        await sqlPool.query(`update users set username=?,gender=?,introduction=? where _id=?`, [username,gender, introduction, _id])
+        await sqlPool.query(`update users set username=?,gender=?,introduction=? where _id=?`, [username, gender, introduction, _id])
     }
 }
-async function  toGetLike(list){
-    let data = await sqlPool.query(`select * from tale where id in (?)`,[list])
+async function toGetLike(list) {
+    let data = await sqlPool.query(`select * from tale where id in (?)`, [list])
     return data[0]
 }
-async function  toGetLikePost(list){
-    let data = await sqlPool.query(`select * from Post where id in (?)`,[list])
+async function toGetLikePost(list) {
+    let data = await sqlPool.query(`select * from Post where id in (?)`, [list])
     return data[0]
 }
-async function  toGetCollection(list){
-    let data = await sqlPool.query(`select * from tale where id in (?)`,[list])
+async function toGetCollection(list) {
+    let data = await sqlPool.query(`select * from tale where id in (?)`, [list])
     return data[0]
 }
-async function  toGetCollectionPost(list){
-    let data = await sqlPool.query(`select * from Post where id in (?)`,[list])
+async function toGetCollectionPost(list) {
+    let data = await sqlPool.query(`select * from Post where id in (?)`, [list])
     return data[0]
 }
+async function toGetUserPost(id) {
+    let res = await sqlPool.query(`select * from post where authorId = ?`, [id])
+    return res[0]
+}
+async function toDeleteUserPost(id) {
+    await sqlPool.query(`delete from post where id = ?`, [id])
+
+}
+async function toGetUserTale(id) {
+    let res = await sqlPool.query(`select * from tale where authorId = ?`, [id])
+    return res[0]
+}
+async function toDeleteUserTale(id) {
+    await sqlPool.query(`delete from tale where id = ?`, [id])
+
+}
+async function toAddUserPost(title, type, content, author, authorId, time, cover) {
+    await sqlPool.query('insert into `post`(`title`,`type`,`content`,`author`,`authorId`,`time`,`cover`) values (?,?,?,?,?,?,?)', [title, type, content, author, authorId, time, cover])
+    await sqlPool.query('update users set postNum = postNum + 1 where _id=?',[authorId])
+}
+async function toAddUserTale(title, type, content, author, authorId, time, cover) {
+    await sqlPool.query('insert into `tale`(`title`,`type`,`content`,`author`,`authorId`,`time`,`cover`) values (?,?,?,?,?,?,?)', [title, type, content, author, authorId, time, cover])
+    await sqlPool.query('update users set taleNum = taleNum + 1 where _id=?',[authorId])
+}
+async function toPostUpdate(id,title,type,content,author,authorId,time,cover){
+    await sqlPool.query(`update users set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`,[title,type,content,author,authorId,time,cover,id])
+  
+}
+
+async function toTaleUpdate(id,title,type,content,author,authorId,time,cover){
+    await sqlPool.query(`update tale set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`,[title,type,content,author,authorId,time,cover,id])
+}
+
+
 const froumController = {
     getPostList: async (req, res) => {
         let id = parseInt(req.query.id)
@@ -203,13 +239,13 @@ const froumController = {
         searchRes.forEach((item) => {
             if (item.whoGood) {
                 item.whoGood = JSON.stringify(item.whoGood)
-               
+
             }
         })
 
         let end = num * page
         let begin = end - num
-        console.log(searchRes,'aa   ')
+  
         if (searchRes.length && begin <= searchRes.length) {
             // console.log(data)
 
@@ -278,17 +314,17 @@ const froumController = {
             })
         }
     },
- 
+
     captchaSend: async (req, res) => {
         maileOption.to = req.body.email
         let Captcha = parseInt(Math.random() * 1000000)
         let createTime = new Date().getTime()
-        console.log(createTime)
+   
         await saveCaptcha(Captcha, createTime, req.body.email)
-        console.log(req.body.email)
+    
         transporter.sendMail(maileOption(req.body.email, Captcha), (err, info) => {
             if (err) {
-                console.log(err)
+    
                 res.send({
                     ok: 0,
                     data: '发送失败请稍后重试'
@@ -304,7 +340,7 @@ const froumController = {
 
     },
     register: async (req, res) => {
-        console.log(req.body)
+     
         let { username, email, password, captcha } = req.body
         let searchRes = await searchCaptcha(captcha, email)
 
@@ -314,7 +350,7 @@ const froumController = {
 
         if (searchRes.length) {
             let time = parseInt((new Date().getTime() - searchRes[0].createtime) / 1000)
-            console.log(time)
+  
             let isUserNameRes = await isUserName(username)
             console
             if (isUserNameRes.length) {
@@ -355,7 +391,7 @@ const froumController = {
 
     },
     login: async (req, res) => {
-        console.log(req.body)
+      
 
         let { username, password } = req.body
         let user = await toLogin(username, password)
@@ -368,7 +404,7 @@ const froumController = {
                 data.toGood = JSON.stringify(data.toGood)
 
             }
-            if(data.toGoodPost){
+            if (data.toGoodPost) {
                 data.toGoodPost = JSON.stringify(data.toGoodPost)
             }
             // console.log(data.toGood,data.toGood.length)
@@ -442,10 +478,10 @@ const froumController = {
     getTale: async (req, res) => {
 
         let id = parseInt(req.query.id)
-        if(id){
+        if (id) {
             let data = await toGetTale(id)
 
-            console.log()
+
             if (data.length) {
                 data = data[0]
                 let authorId = data.authorId
@@ -468,24 +504,24 @@ const froumController = {
                         authorData
                     })
                 }
-    
+
             } else {
                 res.send({
                     ok: 0,
                     errorInfo: '查无此故事'
                 })
             }
-    
-        }else{
-            res.send({ok:0,errorInfo:'查无此故事'})
+
+        } else {
+            res.send({ ok: 0, errorInfo: '查无此故事' })
         }
-      
+
     },
     getTaleComment: async (req, res) => {
 
         let id = parseInt(req.query.id)
         let searchRes = await toGetTaleComment(id)
-
+    
         res.send({
             ok: 1,
             data: searchRes
@@ -495,15 +531,15 @@ const froumController = {
 
         let id = parseInt(req.query.id)
         let searchRes = await toGetPostComment(id)
-        
+
         res.send({
             ok: 1,
             data: searchRes
         })
     },
-    
+
     getAuthor: async (req, res) => {
-        console.log(req.query)
+
         let id = parseInt(req.query.id)
         let searchRes = await toGetAuthor(id)
         if (searchRes.length) {
@@ -550,7 +586,7 @@ const froumController = {
         // console.log(req.query)
         let _id = parseInt(req.query.id)
         let marckTime = new Date()
-        
+
         let data = await toMarck(_id, marckTime.getTime())
         data = data[0][0]
         delete data.password
@@ -558,7 +594,7 @@ const froumController = {
         if (data.toGood) {
             data.toGood = JSON.stringify(data.toGood)
         }
-        if(data.toGoodPost){
+        if (data.toGoodPost) {
             data.toGoodPost = JSON.stringify(data.toGoodPost)
         }
         res.send({
@@ -596,15 +632,15 @@ const froumController = {
         let { likeArr, userGood, taleId, userId } = req.body
         // console.log(likeArr,userGood,taleId,userId)
         let num = JSON.parse(likeArr).length
-        console.log(likeArr, userGood, taleId, userId)
+        // console.log(likeArr, userGood, taleId, userId)
         let searchRes = await toAddPostLike(likeArr, num, userGood, taleId, userId)
         if (searchRes.length) {
             let data = searchRes[0]
-            delete data.password
+            delete data.password 
             if (data.toGood) {
                 data.toGood = JSON.stringify(data.toGood)
             }
-            if(data.toGoodPost){
+            if (data.toGoodPost) {
                 data.toGoodPost = JSON.stringify(data.toGoodPost)
             }
 
@@ -624,7 +660,7 @@ const froumController = {
         let { likeArr, userGood, taleId, userId } = req.body
         // console.log(likeArr,userGood,taleId,userId)
 
-        console.log(likeArr, userGood, taleId, userId)
+        // console.log(likeArr, userGood, taleId, userId)
         let searchRes = await toAddCollection(likeArr, userGood, taleId, userId)
         if (searchRes.length) {
             let data = searchRes[0]
@@ -635,7 +671,7 @@ const froumController = {
             if (data.toGoodPost) {
                 data.toGoodPost = JSON.stringify(data.toGoodPost)
             }
-            
+
             res.send({
                 ok: 1,
                 data
@@ -652,7 +688,7 @@ const froumController = {
         let { likeArr, userGood, taleId, userId } = req.body
         // console.log(likeArr,userGood,taleId,userId)
 
-        console.log(likeArr, userGood, taleId, userId)
+        // console.log(likeArr, userGood, taleId, userId)
         let searchRes = await toAddCollectionPost(likeArr, userGood, taleId, userId)
         if (searchRes.length) {
             let data = searchRes[0]
@@ -660,7 +696,7 @@ const froumController = {
             if (data.toGoodPost) {
                 data.toGoodPost = JSON.stringify(data.toGoodPost)
             }
-            if(data.toGood){
+            if (data.toGood) {
                 data.toGood = JSON.stringify(data.toGood)
             }
 
@@ -678,7 +714,7 @@ const froumController = {
     },
     commentUpdate: async (req, res) => {
         let { textId, content, userId, userName, userAvatar } = req.body
-        console.log(textId, content, userId, userName, userAvatar)
+        // console.log(textId, content, userId, userName, userAvatar)
         await toCommentUpdate(textId, content, userId, userName, userAvatar)
 
         res.send({
@@ -687,48 +723,48 @@ const froumController = {
     },
     commentUpdatePost: async (req, res) => {
         let { textId, content, userId, userName, userAvatar } = req.body
-        console.log(textId, content, userId, userName, userAvatar)
-        await toCommentUpdate(textId, content, userId, userName, userAvatar)
+        // console.log(textId, content, userId, userName, userAvatar)
+        await toCommentUpdatePost(textId, content, userId, userName, userAvatar)
 
         res.send({
             ok: 1
         })
     },
-    getUser:async (req,res) =>{
- 
+    getUser: async (req, res) => {
+
         let _id = parseInt(req.query.id)
-        let searchRes = await sqlPool.query('select * from users where _id = ?',[_id] )
+        let searchRes = await sqlPool.query('select * from users where _id = ?', [_id])
         searchRes = searchRes[0]
-        if(searchRes.length){
+        if (searchRes.length) {
             let data = searchRes[0]
             delete data.password
-            if(data.toGoodPost) {
+            if (data.toGoodPost) {
                 data.toGoodPost = JSON.stringify(data.toGoodPost)
             }
-            if(data.toGood){
+            if (data.toGood) {
                 data.toGood = JSON.stringify(data.toGood)
             }
             res.send({
-                ok:1,
+                ok: 1,
                 data
             })
-        }else{
+        } else {
             res.send({
-                ok:0,
-                errorInfo:'查无此人'
+                ok: 0,
+                errorInfo: '查无此人'
             })
         }
     },
-    getUserArticle:async (req,res)=>{
-   
+    getUserArticle: async (req, res) => {
+
         let id = parseInt(req.query.id)
-        let postList = await sqlPool.query(`select * from post where authorId = ?`,[id])
-        let taleList = await sqlPool.query(`select * from tale where authorId = ?`,[id])
+        let postList = await sqlPool.query(`select * from post where authorId = ?`, [id])
+        let taleList = await sqlPool.query(`select * from tale where authorId = ?`, [id])
         postList = postList[0]
         taleList = taleList[0]
 
         res.send({
-            ok:1,
+            ok: 1,
             postList,
             taleList
         })
@@ -740,7 +776,7 @@ const froumController = {
         _id = Number(_id)
         // console.log(_id, username, gender, introduction)
         let avatar = req.file ? `/${req.file.destination.split('/')[1]}/${req.file.filename}` : ''
-        await toUserUpdate(_id, username,gender,introduction,avatar)
+        await toUserUpdate(_id, username, gender, introduction, avatar)
 
         res.send({
             ok: 1,
@@ -753,82 +789,220 @@ const froumController = {
             }
         })
     },
-    getLike:async (req,res)=>{
-    
-        if(req.body.toGood && req.body.toGood.length){
+    getLike: async (req, res) => {
 
-           like = req.body.toGood
-        //    console.log(like.join(','))
-      
+        if (req.body.toGood && req.body.toGood.length) {
+
+            like = req.body.toGood
+            //    console.log(like.join(','))
+
             let searchRes = await toGetLike(like)
-         
+
             res.send({
-                ok:1,
-                data:JSON.stringify(searchRes)
-            }) 
-        }else{
+                ok: 1,
+                data: JSON.stringify(searchRes)
+            })
+        } else {
             res.send({
-                ok:1,
-                data:JSON.stringify([])
+                ok: 1,
+                data: JSON.stringify([])
             })
         }
-        
-    
+
+
     },
-    getLikePost:async(req,res)=>{
-        if(req.body.toGoodPost){
+    getLikePost: async (req, res) => {
+        if (req.body.toGoodPost) {
             let like = req.body.toGoodPost
             let searchRes = await toGetLikePost(like)
-            console.log(searchRes.length)
+            // console.log(searchRes.length)
             res.send({
-                ok:1,
-                data:JSON.stringify(searchRes)
-            }) 
-        }else{
+                ok: 1,
+                data: JSON.stringify(searchRes)
+            })
+        } else {
             res.send({
-                ok:1,
-                data:JSON.stringify([])
+                ok: 1,
+                data: JSON.stringify([])
             })
         }
     },
-    getCollection:async (req,res)=>{
-    
-        if(req.body.Collection && req.body.collection.length){
+    getCollection: async (req, res) => {
+
+        if (req.body.Collection && req.body.collection.length) {
 
             Collection = req.body.collection
-        //    console.log(like.join(','))
-      
+            //    console.log(like.join(','))
+
             let searchRes = await toGetCollection(Collection)
-         
+
             res.send({
-                ok:1,
-                data:JSON.stringify(searchRes)
-            }) 
-        }else{
+                ok: 1,
+                data: JSON.stringify(searchRes)
+            })
+        } else {
             res.send({
-                ok:1,
-                data:JSON.stringify([])
+                ok: 1,
+                data: JSON.stringify([])
             })
         }
-        
-    
+
+
     },
-    getCollectionPost:async(req,res)=>{
-        if(req.body.collectionPost){
+    getCollectionPost: async (req, res) => {
+        if (req.body.collectionPost) {
             let Collection = req.body.collectionPost
             let searchRes = await toGetCollectionPost(Collection)
-            console.log(searchRes.length)
+            // console.log(searchRes.length)
             res.send({
-                ok:1,
-                data:JSON.stringify(searchRes)
-            }) 
-        }else{
+                ok: 1,
+                data: JSON.stringify(searchRes)
+            })
+        } else {
             res.send({
-                ok:1,
-                data:JSON.stringify([])
+                ok: 1,
+                data: JSON.stringify([])
             })
         }
-    }
+    },
+    getUserPost: async (req, res) => {
+        let id = parseInt(req.query.id)
+        let searchRes = await toGetUserPost(id)
+        let data = searchRes
+        res.send({
+            ok: 1,
+            data
+        })
+    },
+    deleteUserPost: async (req, res) => {
+        const token = req.headers["authorization"].split(' ')[1]
+        let authorId = parseInt(req.query.authorId)
+        let id = parseInt(req.query.id)
+
+        if (token) {
+            let payload = JWT.verify(token)
+            if (payload && payload._id === authorId) {
+                await toDeleteUserPost(id)
+                res.send({
+                    ok: 1
+                })
+            } else {
+                res.send({
+                    ok: 0,
+                    errorInfo: '无权限删除'
+                })
+            }
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '无权限删除'
+            })
+        }
+
+
+    },
+    getUserTale: async (req, res) => {
+        let id = parseInt(req.query.id)
+        let searchRes = await toGetUserTale(id)
+        let data = searchRes
+        res.send({
+            ok: 1,
+            data
+        })
+    },
+    deleteUserTale: async (req, res) => {
+        const token = req.headers["authorization"].split(' ')[1]
+        let authorId = parseInt(req.query.authorId)
+        let id = parseInt(req.query.id)
+
+        if (token) {
+            let payload = JWT.verify(token)
+            if (payload && payload._id === authorId) {
+                await toDeleteUserTale(id)
+                res.send({
+                    ok: 1
+                })
+            } else {
+                res.send({
+                    ok: 0,
+                    errorInfo: '无权限删除'
+                })
+            }
+        } else {
+            res.send({
+                ok: 0,
+                errorInfo: '无权限删除'
+            })
+        }
+
+    },
+    addUserPost: async (req, res) => {
+
+
+        let cover = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        // console.log(cover)
+        let time = new Date()
+        // console.log(time.getDate())
+
+        // console.log(time, moment().format('lll') )
+        let { title, type, content, author, authorId } = req.body
+        await toAddUserPost(title, type, content, author, authorId, time, cover)
+        res.send({
+            ok: 1
+        })
+    },
+    imageAdd: (req, res) => {
+
+        // console.log(req.file)
+        let avatar = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        res.send({
+            "url": `http://localhost:3000/${avatar}`
+        })
+    },
+    addUserTale: async (req, res) => {
+        let cover = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        // console.log(cover)
+        let time = new Date()
+        // console.log(time.getDate())
+
+        // console.log(time, moment().format('lll') )
+        let { title, type, content, author, authorId } = req.body
+        await toAddUserTale(title, type, content, author, authorId, time, cover)
+        res.send({
+            ok: 1
+        })
+    },
+    postUpdate: async (req, res) => {
+
+        let cover = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        // console.log(cover)
+        let time = new Date()
+        // console.log(time.getDate())
+
+        // console.log(time, moment().format('lll') )
+        let { id, title, type, content, author, authorId } = req.body
+        id = parseInt(id)
+        authorId = parseInt(authorId)
+      
+        await toPostUpdate(id, title, type, content, author, authorId, time, cover)
+        res.send({
+            ok: 1
+        })
+    },
+    taleUpdate:async (req,res)=>{
+        
+        let cover = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
+        // console.log(cover)
+        let time = new Date()
+        // console.log(time.getDate())
+       
+        // console.log(time, moment().format('lll') )
+        let {id,title,type,content,author,authorId} = req.body
+        await toTaleUpdate(id,title,type,content,author,authorId,time,cover)
+        res.send({
+            ok:1 
+        }) 
+    },
 }
 
 

@@ -33,6 +33,7 @@ UserRouter.get(`/adminApi/user/getUserList`,UserController.getUserList)
 UserRouter.post(`/adminApi/user/userUpdate`,upload.single('file'),UserController.userUpdate)
 UserRouter.delete(`/adminApi/user/userDelete`,UserController.userDelete)
 UserRouter.post(`/adminApi/user/userAdd`,upload.single('file'),UserController.userAdd)
+
 UserRouter.post(`/adminApi/user/imageAdd`,upload.single('upload'),UserController.imageAdd)
 // UserRouter.delete(`/adminApi/user/userDelete`,UserController.userDelete)
 

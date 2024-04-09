@@ -2,7 +2,7 @@
     <div class="body">
         <div class="mainBox">
             <div class="left">
-                <div :class="`left-item left-magic ${isCollOrtoke(taleForm.whoGood, userId) === 1 ? 'active' : ''}`"
+                <div :class="`left-item left-magic ${isCollOrtoke(taleForm.whoGood, userId) === 1 ? 'cactive' : ''}`"
                     @click="handleLike">
                     <el-tag class="left-el-tag" :type="info" color="rgb(138, 145, 159)" effect="dark" round>
                         {{ taleForm.goodNumber }}
@@ -20,7 +20,7 @@
                     </el-icon>
 
                 </div>
-                <div :class="`left-item ${isCollOrtoke(taleForm.whoCollection, userId) === 1 ? 'active' : ''}`"
+                <div :class="`left-item ${isCollOrtoke(taleForm.whoCollection, userId) === 1 ? 'cactive' : ''}`"
                     @click="handleCollection">
                     <el-tag class="left-el-tag" :type="info" color="rgb(138, 145, 159)" effect="dark" round>
                         {{ HowCollection(taleForm.whoCollection) }}
@@ -58,6 +58,15 @@
                     </div>
 
                     <div class="comment-content-box">
+                        <div class="sortBox">
+                            <div class="sort">
+                                <span :class="`sort-one ${howSort === 0 ? 'active' : ''}`" @click="sortSelect"
+                                    data-id="0">最新</span>
+                                <span :class="`sort-two ${howSort === 1 ? 'active' : ''}`" @click="sortSelect"
+                                    data-id="1">最旧</span>
+        
+                            </div>
+                        </div>
                         <div v-for="item in commentForm" :key="item.id" class="comment-content-box-item">
                             <div class="comment-content-box-item-left">
                                 <el-avatar :src="`http://localhost:3000${item.userAvatar}`" />
@@ -65,7 +74,7 @@
                             <div calss="comment-content-box-item-right">
                                 <div class="comment-content-box-item-right-username">{{ item.userName }}</div>
                                 <div class="comment-content-box-item-right-content">{{ item.content }}
-
+                                
                                 </div>
                        
                             </div>
@@ -96,7 +105,6 @@
 <script setup>
 import { TagProps } from 'element-plus'
 import { onMounted, ref } from 'vue'
-
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { MagicStick, View, ChatDotRound, StarFilled, Comment } from '@element-plus/icons-vue'
@@ -107,10 +115,33 @@ const route = useRoute()
 const router = useRouter()
 const userForm = ref({})
 const taleForm = ref({})
-const isActive = ref('active')
+
+const howSort = ref(0)
 const userId = ref(0)
 const commentForm = ref({})
 const authorItem = ref({})
+const sortSelect = async (evt) => {
+    // console.log(evt.currentTarget.dataset.id)
+
+    howSort.value = parseInt(evt.currentTarget.dataset.id)
+   
+    if(howSort.value === 0){
+      
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return tiemb.getDate() - timea.getDate() 
+        })
+    }else{
+  
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return  timea.getDate() - tiemb.getDate() 
+        })
+    }
+
+}
 const whatTime = (time) => {
     let date = new Date(time)
     let year = date.getFullYear()
@@ -212,7 +243,7 @@ const handleLike = async () => {//点过
             console.log(res.data)
             store.commit("changeUserFormInfo", res.data.data)
             taleForm.value.whoGood = JSON.stringify(arrLike)
-            taleForm.value.goodNumber--
+            taleForm.value.goodNumber++
         })
 
     }
@@ -307,8 +338,12 @@ onMounted(() => {
     })
     axios.get(`/froumApi/froum/getTaleComment?id=${route.params.id}`).then(res => {
         commentForm.value = res.data.data
-
-    })
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return tiemb.getDate() - timea.getDate() 
+        })
+    })  
    
 })
 
@@ -381,7 +416,7 @@ onMounted(() => {
     text-align: left;
 }
 
-.active {
+.cactive {
     color: rgba(24, 220, 2, 0.879);
 }
 
@@ -426,7 +461,7 @@ onMounted(() => {
     width: 100%;
     border-radius: 7px;
     margin-top: 30px;
-    margin-bottom: 70px;
+    margin-bottom: 25px;
     padding-bottom: 10px;
 }
 
@@ -479,6 +514,65 @@ onMounted(() => {
     text-overflow: ellipsis;
     max-width: 240px;
 }
+
+.sortBox {
+    border-bottom: #8a919f4a 1px solid;
+    padding: 12px;
+    font-size: 17px;
+    color: #8a919f;
+
+}
+
+.sort-one {
+    padding-right: 40px;
+    padding-left: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.sort-two {
+    padding-right: 20px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 100px;
+}
+
+.sort-one:hover {
+    color: rgb(24, 220, 2);
+}
+
+.sort-two:hover {
+    color: rgb(24, 220, 2);
+}
+
+.active {
+    color: black;
+}
+
+.sort-one.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 15px;
+    background-color: rgba(24, 220, 2, 0.914);
+}
+
+.sort-two.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 5px;
+    background-color: rgba(24, 220, 2, 0.914);
+}
+
 </style>
 <style lang="scss">
 .contentBox1008611 {

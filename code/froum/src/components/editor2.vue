@@ -41,36 +41,43 @@ const showEmoji = (emoji) => {
 const text = ref('')
 const commentForm = ref({
     textId: 0,
-    content:emojisOutput,
+    content: emojisOutput,
     userId: '',
     userName: '',
     userAvatar: ''
 })
 const handleInput = () => {
-    console.log(emojisOutput.value)
+
 }
 const handleEmoji = () => {
     isShow.value = !isShow.value
-    
+
 }
 const handleUpdate = () => {
     if (store.state.userFormInfo._id) {
-        if(emojisOutput.value !=''){
-        commentForm.value.userId = store.state.userFormInfo._id
-        commentForm.value.userName = store.state.userFormInfo.username
-        commentForm.value.userAvatar = store.state.userFormInfo.avatar
-        commentForm.value.textId = route.params.id
-        console.log(route.params.id)
-        axios.post(`/froumApi/froum/commentUpdatePost`, commentForm.value)
-        isShow.value = !isShow.value
-        }else{
+        if (emojisOutput.value != '') {
+            commentForm.value.userId = store.state.userFormInfo._id
+            commentForm.value.userName = store.state.userFormInfo.username
+            commentForm.value.userAvatar = store.state.userFormInfo.avatar
+            commentForm.value.textId = route.params.id
+            console.log(route.params.id)
+            axios.post(`/froumApi/froum/commentUpdatePost`, commentForm.value).then(res => {
+                if (res.data.ok) {
+                    ElMessage({
+                        message: '发布评论成功',
+                        type: 'success',
+                    })
+                }
+            })
+            isShow.value = false
+        } else {
             ElMessage({
-            message: '评论不能为空',
-            type: 'warning',
-            
-        })
+                message: '评论不能为空',
+                type: 'warning',
+
+            })
         }
- 
+
     } else {
         ElMessage({
             message: '请确认登陆后评论哦',
@@ -102,6 +109,4 @@ const handleUpdate = () => {
 .Picker-emoji-box {
     position: relative;
 }
-
-
 </style>

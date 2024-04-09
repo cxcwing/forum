@@ -2,12 +2,12 @@
     <div class="body">
         <div class="mainBox">
             <div class="left">
-                <div :class="`left-item left-magic ${isCollOrtoke(postForm.whoGood, userId) === 1 ? 'active' : ''}`"
+                <div :class="`left-item left-magic ${isCollOrtoke(postForm.whoGood, userId) === 1 ? 'cactive' : ''}`"
                     @click="handleLike">
                     <el-tag class="left-el-tag" :type="info" color="rgb(138, 145, 159)" effect="dark" round>
                         {{ postForm.goodNumber }}
                     </el-tag>
-                    <el-icon class="left-el-icon ">
+                    <el-icon class="left-el-icon">
                         <MagicStick />
                     </el-icon>
                 </div>
@@ -20,7 +20,7 @@
                     </el-icon>
 
                 </div>
-                <div :class="`left-item ${isCollOrtoke(postForm.whoCollection, userId) === 1 ? 'active' : ''}`"
+                <div :class="`left-item ${isCollOrtoke(postForm.whoCollection, userId) === 1 ? 'cactive' : ''}`"
                     @click="handleCollection">
                     <el-tag class="left-el-tag" :type="info" color="rgb(138, 145, 159)" effect="dark" round>
                         {{ HowCollection(postForm.whoCollection) }}
@@ -58,6 +58,15 @@
                     </div>
 
                     <div class="comment-content-box">
+                        <div class="sortBox">
+                            <div class="sort">
+                                <span :class="`sort-one ${howSort === 0 ? 'active' : ''}`" @click="sortSelect"
+                                    data-id="0">最新</span>
+                                <span :class="`sort-two ${howSort === 1 ? 'active' : ''}`" @click="sortSelect"
+                                    data-id="1">最旧</span>
+        
+                            </div>
+                        </div>
                         <div v-for="item in commentForm" :key="item.id" class="comment-content-box-item">
                             <div class="comment-content-box-item-left">
                                 <el-avatar :src="`http://localhost:3000${item.userAvatar}`" />
@@ -67,11 +76,11 @@
                                 <div class="comment-content-box-item-right-content">{{ item.content }}
 
                                 </div>
-                       
+
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
 
             </div>
@@ -80,11 +89,11 @@
                     <div class="right-one-avatar">
                         <el-avatar :size="60" :src="`http://localhost:3000${authorItem.avatar}`" />
                     </div>
-                    <div >
+                    <div>
                         <div class="right-one-username"> {{ authorItem.username }}</div>
                         <div class="right-one-introduction">{{ authorItem.introduction }}</div>
                     </div>
-                 
+
                 </div>
             </div>
 
@@ -102,12 +111,13 @@ import axios from 'axios';
 import { MagicStick, View, ChatDotRound, StarFilled, Comment } from '@element-plus/icons-vue'
 import editor from '../components/editor2.vue'
 import { useStore } from 'vuex';
+const howSort = ref(0)
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
 const userForm = ref({})
 const postForm = ref({})
-const isActive = ref('active')
+
 const userId = ref(0)
 const commentForm = ref({})
 const authorItem = ref({})
@@ -118,6 +128,27 @@ const whatTime = (time) => {
     let day = date.getDate()
     let newTime = year + '-' + mo + '-' + day
     return newTime
+}
+
+
+const sortSelect = async (evt) => {
+    // console.log(evt.currentTarget.dataset.id)
+
+    howSort.value = parseInt(evt.currentTarget.dataset.id)
+    if(howSort.value === 0){
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return tiemb.getDate() - timea.getDate() 
+        })
+    }else{
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return  timea.getDate() - tiemb.getDate() 
+        })
+    }
+
 }
 const isCollOrtoke = (item, id) => {
     // console.log(item,id)
@@ -153,6 +184,7 @@ const handleLike = async () => {//点过
     // console.log(isCollOrtoke(postForm.value.whoGood,userId.value))
     // console
     if (isCollOrtoke(postForm.value.whoGood, userId.value) === 1) {//删除
+        console.log('1111111111111111111')
         let arrLike = JSON.parse(postForm.value.whoGood)
         let arrUser = store.state.userFormInfo.toGoodPost
         let index1 = arrLike.indexOf(userId.value)
@@ -174,6 +206,7 @@ const handleLike = async () => {//点过
             postForm.value.goodNumber--
         }
     } else if (isCollOrtoke(postForm.value.whoGood, userId.value) === 2) {
+        console.log('2222222222222222')
         let arrLike = JSON.parse(postForm.value.whoGood)
         let arrUser = store.state.userFormInfo.toGoodPost
 
@@ -196,7 +229,7 @@ const handleLike = async () => {//点过
             postForm.value.goodNumber++
         }
     } else if (isCollOrtoke(postForm.value.whoGood, userId.value) === 0) {
-
+        console.log('000000000000')
         let arrLike = []
         let arrUser = store.state.userFormInfo.toGoodPost
         if (!arrUser) {
@@ -214,7 +247,7 @@ const handleLike = async () => {//点过
             console.log(res.data)
             store.commit("changeUserFormInfo", res.data.data)
             postForm.value.whoGood = JSON.stringify(arrLike)
-            postForm.value.goodNumber--
+            postForm.value.goodNumber++
         })
 
     }
@@ -225,12 +258,12 @@ const handleCollection = async () => {//点过
     console.log(isCollOrtoke(postForm.value.whoCollection, userId.value))
     // console
     if (isCollOrtoke(postForm.value.whoCollection, userId.value) === 1) {//删除
-        
+
         let arrLike = JSON.parse(postForm.value.whoCollection)
         let arrUser = store.state.userFormInfo.collectionPost
         let index1 = arrLike.indexOf(userId.value)
         let index2 = arrUser.indexOf(postForm.value.id)
- 
+
         arrLike.splice(index1, 1)
         arrUser.splice(index2, 1)
         let form = {
@@ -249,7 +282,7 @@ const handleCollection = async () => {//点过
     } else if (isCollOrtoke(postForm.value.whoCollection, userId.value) === 2) {
         let arrLike = JSON.parse(postForm.value.whoCollection)
         let arrUser = store.state.userFormInfo.collectionPost
-        console
+
         if (!arrUser) {
             arrUser = []
         }
@@ -303,18 +336,25 @@ onMounted(() => {
     axios.get(`/froumApi/froum/getPost?id=${route.params.id}`).then(res => {
         userForm.value = res.data.athorData
         postForm.value = res.data.data
-        
-        axios.get(`/froumApi/froum/getAuthor?id=${postForm.value.authorId}`).then(res2 =>{
+
+        axios.get(`/froumApi/froum/getAuthor?id=${postForm.value.authorId}`).then(res2 => {
             authorItem.value = res2.data.data
-    
+
         })
     })
     axios.get(`/froumApi/froum/getPostComment?id=${route.params.id}`).then(res => {
         commentForm.value = res.data.data
-
+        commentForm.value.sort((a,b) =>{
+            let timea  = new Date(a.time)
+            let tiemb  = new Date(b.time)
+            return tiemb.getDate() - timea.getDate() 
+        })
     })
-   
+
+
+
 })
+
 
 
 </script>
@@ -385,7 +425,7 @@ onMounted(() => {
     text-align: left;
 }
 
-.active {
+.cactive {
     color: rgba(24, 220, 2, 0.879);
 }
 
@@ -429,65 +469,132 @@ onMounted(() => {
     background-color: white;
     width: 100%;
     border-radius: 7px;
-    margin-top: 30px;
-    margin-bottom: 70px;
+    margin-top: 20px;
+    margin-bottom: 30px;
     padding-bottom: 10px;
 }
 
 .Comment {
     background-color: white;
-    margin-top:20px; 
+    margin-top: 20px;
     padding: 20px;
 }
 
-.comment-content-box-item{
-    padding:15px 0px ;
+.comment-content-box-item {
+    padding: 15px 0px;
     display: flex;
     margin-bottom: 15px;
-    border-bottom:1px solid rgba(219, 217, 217, 0.252);
+    border-bottom: 1px solid rgba(219, 217, 217, 0.252);
 }
-.comment-content-box-item-left{
-    margin-right:20px;
+
+.comment-content-box-item-left {
+    margin-right: 20px;
 }
-.comment-content-box-item-right-username{
+
+.comment-content-box-item-right-username {
     color: rgba(24, 220, 2, 0.88);
-    padding:5px 0;
+    padding: 5px 0;
 }
-.comment-content-box-item-right-content{
+
+.comment-content-box-item-right-content {
     max-width: 600px;
     word-wrap: break-word;
     font-size: 16px;
     color: #5b5b5b;
 }
-.right-one{
+
+.right-one {
     padding: 12px;
     background-color: white;
     border-radius: 5px;
     /* margin-top:20px; */
     position: sticky;
-    top:10vh;
+    top: 10vh;
     display: flex;
 
 }
-.right-one-avatar{
+
+.right-one-avatar {
     margin-right: 20px;
 }
-.right-one-username{
+
+.right-one-username {
     color: rgba(24, 220, 2, 0.88);
     font-weight: 600;
 }
-.right-one-introduction{
-    padding:3px 0px;
+
+.right-one-introduction {
+    padding: 3px 0px;
     color: #8A919F;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     max-width: 240px;
 }
+
+.sortBox {
+    border-bottom: #8a919f4a 1px solid;
+    padding: 12px;
+    font-size: 17px;
+    color: #8a919f;
+
+}
+
+.sort-one {
+    padding-right: 40px;
+    padding-left: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.sort-two {
+    padding-right: 20px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 100px;
+}
+
+.sort-one:hover {
+    color: rgb(24, 220, 2);
+}
+
+.sort-two:hover {
+    color: rgb(24, 220, 2);
+}
+
+.active {
+    color: black;
+}
+
+.sort-one.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 15px;
+    background-color: rgba(24, 220, 2, 0.914);
+}
+
+.sort-two.active::before {
+    content: '';
+    width: 20px;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
+    height: 4px;
+    bottom: -12px;
+    left: 5px;
+    background-color: rgba(24, 220, 2, 0.914);
+}
+
 </style>
 <style lang="scss">
 .contentBox1008611 {
-    min-height:50vh;
+    min-height: 50vh;
+
     img {
         max-width: 100%;
         height: auto;
