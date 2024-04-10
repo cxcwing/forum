@@ -2,8 +2,8 @@
     <div class="top">
 
         <div class='left'>
-            <el-menu :router="true" :ellipsis="false" active-text-color="#02c9a6" id="el-menu" :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
-                @select="handleSelect">
+            <el-menu :router="true" :ellipsis="false" active-text-color="#02c9a6" id="el-menu"
+                :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                 <div class="logo">
                     草吧
                 </div>
@@ -11,25 +11,26 @@
                 <el-menu-item index="/post">贴子</el-menu-item>
                 <!-- <el-menu-item index="/home">个人中心</el-menu-item> -->
                 <div class="searchInput">
-                    <el-input id="search" @input="handleInput" v-model="search" size="large" style=" min-width: 400px;max-width: 500px;" placeholder="搜索"
-                        class="input-with-select">
+                    <el-input id="search" @input="handleInput" v-model="search" size="large"
+                        style=" min-width: 400px;max-width: 500px;" placeholder="搜索" class="input-with-select">
                         <template #append>
                             <el-button :icon="Search" />
                         </template>
                     </el-input>
                     <div v-if="searchList.length" class="search-ul">
-                        <div  v-for="item in searchList" :key="item.id" class="search-li" @click="handleTo(item.id)">
+                        <div v-for="item in searchList" :key="item.id" class="search-li" @click="handleTo(item.id)">
                             {{ item.title }}
                         </div>
-              
-                
+
+
                     </div>
                 </div>
                 <div class='avatar'>
-                    <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
-                    :src='`http://localhost:3000${store.state.userFormInfo.avatar}`'/>
-                    <el-avatar v-else="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass" :size="40"
-                    :src='`http://localhost:3000/images/1711108153245-0.png`'/>
+                    <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass"
+                        :size="40" :src='`http://localhost:3000${store.state.userFormInfo.avatar}`' />
+                    <el-avatar v-else="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut"
+                        :class="avatarClass" :size="40" :src='`http://localhost:3000/images/1711108153245-0.png`' />
+
                     <div v-if="userForm._id" @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
 
                         <span class="username">{{ userForm.username }}</span>
@@ -38,18 +39,18 @@
                             <span>lv{{ userForm.level }}</span>
                         </div>
                         <div class="powerBox">
-                            <span class="power">能量 :{{ userForm.power}}</span>
+                            <span class="power">能量 :{{ userForm.power }}</span>
                         </div>
-                        <div  class="goodBox">
+                        <div class="goodBox">
                             <div class="good">
-                                <p class="goodTop">{{howCollection}}</p>
+                                <p class="goodTop">{{ howCollection }}</p>
                                 <p class="goodFooter goodFooter">收藏</p>
                             </div>
-                            <div  class="beGood">
+                            <div @click="handleTale" class="beGood">
                                 <p class="goodTop">{{ userForm.taleNum }}</p>
                                 <p class="goodFooter beGoodFooter">故事</p>
                             </div>
-                            <div  class="beShou">
+                            <div @click="handlePost" class="beShou">
                                 <p class="goodTop">{{ userForm.postNum }}</p>
                                 <p class="goodFooter beShouFooter">贴子</p>
                             </div>
@@ -69,7 +70,7 @@
                             <el-icon>
                                 <EditPen />
                             </el-icon>
-                            <span class="goTo" >创作管理</span>
+                            <span class="goTo">创作管理</span>
 
                             <el-icon>
                                 <ArrowRight />
@@ -95,16 +96,16 @@
                         <div class="powerBox">
                             <span class="power">能量 :???</span>
                         </div>
-                        <div  class="goodBox">
+                        <div class="goodBox">
                             <div class="good">
                                 <p class="goodTop">?</p>
                                 <p class="goodFooter goodFooter">收藏</p>
                             </div>
-                            <div  class="beGood">
+                            <div class="beGood">
                                 <p class="goodTop">?</p>
                                 <p class="goodFooter beGoodFooter">故事</p>
                             </div>
-                            <div  class="beShou">
+                            <div class="beShou">
                                 <p class="goodTop">?</p>
                                 <p class="goodFooter beShouFooter">贴子</p>
                             </div>
@@ -132,15 +133,20 @@
                         </div>
 
                         <div @click="handleToLogin" class="exit goToBox">
-                            <el-icon><Van /></el-icon>
+                            <el-icon>
+                                <Van />
+                            </el-icon>
                             <span class="goTo">点击登陆</span>
                             <el-icon>
                                 <ArrowRight />
                             </el-icon>
                         </div>
+
                     </div>
                 </div>
-
+                <div class="toLogin" v-if="!isLogin">
+                    <el-button type="success" plain @click="handleToLogin" >点击登陆</el-button>
+                </div>
 
             </el-menu>
         </div>
@@ -149,12 +155,13 @@
 </template>
 
 <script setup>
-import { ref,onMounted,computed } from 'vue'
-import { Search,Van,EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
+import { ref, onMounted, computed } from 'vue'
+import { Search, Van, EditPen, ArrowRight, SwitchButton, User } from '@element-plus/icons-vue'
 import { useStore } from 'vuex';
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import axios from 'axios';
+const isLogin = ref(false)
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
@@ -165,91 +172,102 @@ const form = ref('form')
 const avatarClass = ref('one')
 const idLevel = ref('idLevel')
 const searchList = ref([])
-const whatRole = ()=> {
-    if(store.state.userFormInfo.level <= 4){
+const whatRole = () => {
+    if (store.state.userFormInfo.level <= 4) {
         return '普通用户'
-    }else{
+    } else {
         return '高能用户'
     }
-    
+
 }
 const avatarHover = () => {
     // console.log(1)
     form.value = 'form formHover'
     avatarClass.value = 'one Hover'
 }
-const handleToLogin = ()=>{
+const handleToLogin = () => {
     window.location.href = '/login'
 }
 const mouseOut = () => {
     form.value = 'form'
     avatarClass.value = 'one'
 }
-const handleTo = (id) =>{
+const handleTo = (id) => {
     let arr2 = window.location.href.split('/')
-    if(arr2[arr2.length -1].includes('post')){
+    if (arr2[arr2.length - 1].includes('post')) {
         router.push(`/post-view/${id}`)
-    }else if(arr2[arr2.length -1].includes('tale')){
+    } else if (arr2[arr2.length - 1].includes('tale')) {
         router.push(`/tale-view/${id}`)
     }
-   
+
     search.value = ''
-    searchList.value =[]
+    searchList.value = []
 }
-const handleExit = ()=>{
+const handleExit = () => {
     localStorage.removeItem('Ctoken')
     localStorage.removeItem('vuex')
     window.location.href = '/login'
 }
-const handleInput = (evt)=>{
-   
-     let arr2 = window.location.href.split('/')
-   
-     if(arr2[arr2.length -1].includes('post')){
-      
-        if(evt){
-        searchList.value =  store.state.postList.filter((item) => item.title.includes(evt))
-        console.log(searchList.value)
-     
-    }else{
-        searchList.value =[]
+const handleInput = (evt) => {
+
+    let arr2 = window.location.href.split('/')
+
+    if (arr2[arr2.length - 1].includes('post')) {
+
+        if (evt) {
+            searchList.value = store.state.postList.filter((item) => item.title.includes(evt))
+
+
+        } else {
+            searchList.value = []
+        }
+    } else if (arr2[arr2.length - 1].includes('tale')) {
+
+        if (evt) {
+            searchList.value = store.state.taleList.filter((item) => item.title.includes(evt))
+
+        } else {
+            searchList.value = []
+        }
     }
-     }else if(arr2[arr2.length -1].includes('tale')){
-           
-    if(evt){
-        searchList.value =  store.state.taleList.filter((item) => item.title.includes(evt))
-     
-    }else{
-        searchList.value =[]
-    }
-     }
-  
-        
- 
+
+
+
 
 }
-const howCollection = computed(()=>{
+const handleTale = () => {
+    router.push(`/controll/taleList`)
+}
+const handlePost = () => {
+    router.push(`/controll/postList`)
+}
+const howCollection = computed(() => {
     // userForm.collection===null?0:userForm.collection.length
-    if(userForm.value.collection === null){
+    if (userForm.value.collection === null) {
         return 0
-    }else if(userForm.value.collection !=null){
+    } else if (userForm.value.collection != null) {
         return userForm.value.collection.length
     }
 })
-onMounted(async ()=>{
+onMounted(async () => {
 
 
-   let arr1 = window.location.href.split('/')
-    activeIndex.value=`/${window.location.href.split('/')[arr1.length - 1]}`
+    let arr1 = window.location.href.split('/')
+    activeIndex.value = `/${window.location.href.split('/')[arr1.length - 1]}`
     userForm.value = store.state.userFormInfo
+    if (userForm.value._id) {
+        isLogin.value = true
+    } else {
+        isLogin.value = false
+    }
 })
 
-const handleCenter = ()=>{
+const handleCenter = () => {
     router.push('/home/center')
     activeIndex.value = null
 }
 
-const handleController = ()=>{
+const handleController = () => {
     router.push('/controll/article-home')
     activeIndex.value = null
 }
@@ -303,7 +321,11 @@ const handleController = ()=>{
     background-image: linear-gradient(45deg, #8bfff4 0%, #2bffdc 52%, #2bff6c 88%);
 
 }
-
+.toLogin{
+    height: 100%;
+    line-height: 60px;
+    margin-left: 70px;
+}
 .goodTop {
     font-size: 20px;
 
@@ -449,29 +471,32 @@ const handleController = ()=>{
 .searchInput {
     margin-top: 12px;
     margin-left: 10%;
-    position:relative;
+    position: relative;
 }
-.search-ul{
+
+.search-ul {
     position: absolute;
     max-height: 500px;
     width: 400px;
-    top:45px;
+    top: 45px;
     background-color: white;
     border-radius: 5px;
     border: 1px solid rgba(88, 86, 86, 0.077);
-    padding-top:5px;
-    padding-bottom:1px;
- 
+    padding-top: 5px;
+    padding-bottom: 1px;
+
 }
-.search-li{
-   
+
+.search-li {
+
     background-color: white;
     height: 40px;
     line-height: 40px;
     padding-left: 2px;
     color: #414241;
 }
-.search-li:hover{
+
+.search-li:hover {
     background-color: #6f746e46;
     cursor: pointer;
 }
@@ -481,7 +506,7 @@ const handleController = ()=>{
     position: sticky;
     width: 100%;
     background-color: white;
-    top:0;
+    top: 0;
     z-index: 1000;
     /* display: grid; */
     /* grid-template-columns: 1fr 1fr; */
@@ -512,13 +537,12 @@ const handleController = ()=>{
     line-height: 60px;
     background: rgb(0, 246, 148);
     /* background: linear-gradient(0deg, rgba(0, 246, 148, 1) 0%, rgba(0, 255, 222, 1) 100%); */
- 
+
     font-size: 30px;
     font-weight: bold;
-    background-image: -webkit-linear-gradient(0deg, rgba(0, 246, 148, 1) 0%, rgba(0, 255, 222, 1) 100%); 
+    background-image: -webkit-linear-gradient(0deg, rgba(0, 246, 148, 1) 0%, rgba(0, 255, 222, 1) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     cursor: pointer;
 }
-
 </style>

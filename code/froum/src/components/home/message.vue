@@ -42,9 +42,7 @@ import { useStore } from 'vuex'
 import axios from 'axios';
 import upLoad from '../../../util/upLoad.js';
 const store = useStore()
-onMounted(() => {
 
-})
 
 let { _id,username,  avatar, gender, introduction } = store.state.userFormInfo
 gender = String(gender)
@@ -97,6 +95,11 @@ const handleSubmit = () => {
                     ...userForm.value,
                     ...res.data.data
                 }
+                ElMessage({
+                        message: '更新信息成功',
+                        type: 'success',
+              
+                    })
                 store.commit("changeUserFormInfo", res.data.data)
             } else {
                 console.log('失败捏')

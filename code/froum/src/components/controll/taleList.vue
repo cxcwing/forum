@@ -107,7 +107,7 @@
                         </li>
                     </ul>
 
-                    <div v-else> <el-empty :image-size="200" description="空空如也，快去寻找心仪的文章吧" /></div>
+                    <div v-else> <el-empty :image-size="200" description="空空如也，快去创作吧" /></div>
                 </div>
             </div>
         </el-card>

@@ -185,7 +185,7 @@ const centerSearchInput = () => {
             
             return item.title.includes(centerSearch.value)
         })
-        console.log(searchList.value)
+
     }else{
         searchList.value = []
     }

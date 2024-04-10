@@ -16,11 +16,17 @@ import postAdd from '@/components/controll/postAdd.vue'
 import taleAdd from '@/components/controll/taleAdd.vue'
 import articleEdit from '@/components/controll/articleEdit.vue'
 import articleHome from '@/components/controll/articleHome.vue'
+import forget from '@/views/forget.vue'
 const routes = [
   {
     path: '/login',
     name: 'login',
     component: login
+  },
+  {
+    path:'/forget',
+    name:'forget',
+    component:forget
   },
   {
     path: '/mainBox',

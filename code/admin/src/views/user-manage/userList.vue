@@ -10,7 +10,48 @@
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <el-table size="large" :data="userList" style="width: 100%">
+        <div class="searchBox">
+            <el-input @input="searchInput" v-model="searchContnet" style="width: 240px" size="large" placeholder="搜索" />
+        </div>
+        <el-table v-if="!searchList.length" size="large" :data="userList" style="width: 100%">
+            <el-table-column label="头像" width="180">
+                <template #default="scope">
+                    <div v-if="scope.row.avatar"><el-avatar :size="50"
+                            :src="`http://localhost:3000${scope.row.avatar}`" /></div>
+                    <div v-else><el-avatar :size="50"
+                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" /></div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="username" label="用户名" width="180" />
+
+            <el-table-column label="性别" width="180">
+                <template #default="scope">
+                    <div v-if="scope.row.gender === 0">
+                        <span>保密</span>
+                    </div>
+                    <div v-else-if="scope.row.gender === 1">
+                        <span>女</span>
+                    </div>
+                    <div v-else-if="scope.row.gender === 2">
+                        <span>男</span>
+                    </div>
+                    <div v-else>
+                        <span>武装直升机</span>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="email" label="用户邮箱" />
+            <el-table-column prop="vip" label="用户等级" />
+            <el-table-column fixed="right" label="操作" width="180">
+                <template #default="scoe">
+                    <el-button type="primary" @click="handleEdit(scoe.row)" size='small'>编辑</el-button>
+                    <el-button type="danger" @click="handleDelete(scoe.row)" size='small'>删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+
+        <el-table v-else size="large" :data="searchList" style="width: 100%">
             <el-table-column label="头像" width="180">
                 <template #default="scope">
                     <div v-if="scope.row.avatar"><el-avatar :size="50"
@@ -109,6 +150,16 @@ import { ElMessage } from 'element-plus'
 const userList = ref([])
 const userForm = ref({})
 
+const searchContnet = ref('')
+const searchList = ref([])
+const searchInput = () => {
+    if (searchContnet.value != '') {
+        searchList.value = userList.value.filter(item => item.username.includes(searchContnet.value))
+    } else {
+        searchList.value = []
+    }
+}
+
 const dialogVisible = ref(false)
 const DeleteVisible = ref(false)
 const handleChange = (file) => {
@@ -163,8 +214,16 @@ const handleDelete = (data) => {
 const handleSureDelete = async ()=>{
     console.log(deleteId,'11111111111')
     DeleteVisible.value = false
-   let res = await axios.delete(`/adminApi/user/userDelete?_id=${deleteId}`)
-   getUserList()
+    await axios.delete(`/adminApi/user/userDelete?_id=${deleteId}`).then(res =>{
+    ElMessage({
+            message: '删除成功.',
+            type: 'success',
+        })
+
+   })
+
+   await getUserList()
+   searchInput()
 }
 
 const handleSure = async () => {

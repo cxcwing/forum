@@ -11,7 +11,7 @@ const mailerConfig = {
     secure: true,
     auth: {
         user: 'cunxicao@163.com',
-        pass: 'VLHOSBIHMYKMPZIV'
+        pass: ''
     }
 }
 const maileOption = (email, Captcha) => {
@@ -21,12 +21,12 @@ const maileOption = (email, Captcha) => {
         to: email,
         subject: `草吧注册验证信息，您的验证码是:${Captcha}`,
         text: `
-    <div>
-        <p>宝贝您好！</p>
-        <br>
-        <p>欢迎注册草吧，您的验证码是 :${Captcha}</p>
+   
+        宝贝您好！
+    
+        欢迎注册草吧，您的验证码是 :${Captcha}
         
-    </div>
+  
     `,
         // attachments:[{   发送附件
         //     filename:'',

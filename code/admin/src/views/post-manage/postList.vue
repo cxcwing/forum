@@ -9,24 +9,26 @@
                     <h2 class="listXie" href="/">贴子列表</h2>
                 </el-breadcrumb-item>
             </el-breadcrumb>
+
         </div>
-        <el-table size="large" :data="postList" style="width: 100%">
+        <div class="searchBox">
+            <el-input @input="searchInput" v-model="searchContnet" style="width: 240px" size="large" placeholder="搜索" />
+        </div>
+
+        <el-table v-if="!searchList.length" size="large" :data="postList" style="width: 100%">
             <el-table-column label="封面" width="180">
                 <template #default="scope">
                     <div v-if="scope.row.cover">
-                        <!-- <el-avatar :size="50"
-                            :src="`http://localhost:3000/${scope.row.cover}`" /> -->
-                            <el-image style="width: 80px; height: 80px" :src="`http://localhost:3000/${scope.row.cover}`" fit="cover" />
-                        </div>
+                        <el-image style="width: 80px; height: 80px" :src="`http://localhost:3000/${scope.row.cover}`"
+                            fit="cover" />
+                    </div>
                     <div v-else>
-                        <!-- <el-avatar :size="50"
-                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" /> -->
-                            <el-image style="width: 80px; height: 80px" src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" fit="cover" />
+                        <el-image style="width: 80px; height: 80px"
+                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" fit="cover" />
                     </div>
                 </template>
             </el-table-column>
             <el-table-column label="标题" prop="title" width="200" />
-
             <el-table-column label="类型" width="100">
                 <template #default="scope">
                     <div v-if="scope.row.type === 0">
@@ -44,10 +46,8 @@
                     <div v-else-if="scope.row.type === 4">
                         <span>求助</span>
                     </div>
-                    <div v-else>
-                        <span>我超，你怎么选到这个的？？？</span>
-                    </div>
-                   
+
+
                 </template>
             </el-table-column>
             <el-table-column width="100" prop="HowGood" label="收藏数" />
@@ -71,13 +71,69 @@
 
 
 
-        <el-dialog v-model="dialogVisible" title="请确认删除" width="500" >
+        <el-table v-else size="large" :data="searchList" style="width: 100%">
+            <el-table-column label="封面" width="180">
+                <template #default="scope">
+                    <div v-if="scope.row.cover">
+                        <el-image style="width: 80px; height: 80px" :src="`http://localhost:3000/${scope.row.cover}`"
+                            fit="cover" />
+                    </div>
+                    <div v-else>
+                        <el-image style="width: 80px; height: 80px"
+                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" fit="cover" />
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column label="标题" prop="title" width="200" />
+            <el-table-column label="类型" width="100">
+                <template #default="scope">
+                    <div v-if="scope.row.type === 0">
+                        <span>无事水水</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 1">
+                        <span>趣事分享</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 2">
+                        <span>游戏相关</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 3">
+                        <span>意见征集</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 4">
+                        <span>求助</span>
+                    </div>
+
+
+                </template>
+            </el-table-column>
+            <el-table-column width="100" prop="HowGood" label="收藏数" />
+            <el-table-column width="100" prop="HowCollection" label="点赞数" />
+            <el-table-column width="100" prop="HowComment" label="浏览量" />
+            <el-table-column width="120" prop="author" label="作者" />
+            <el-table-column width="120" prop="time" label="更新时间" />
+            <el-table-column fixed="right" label="发布" width="120">
+                <template #default="scope">
+                    <el-switch v-model="scope.row.isPublish" @change="handleSwitchChange(scope.row)" />
+                </template>
+            </el-table-column>
+
+            <el-table-column fixed="right" label="操作" width="180">
+                <template #default="scoe">
+                    <el-button type="primary" @click="handleEdit(scoe.row)" size='small'>编辑</el-button>
+                    <el-button type="danger" @click="handleDelete(scoe.row)" size='small'>删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+
+
+        <el-dialog v-model="dialogVisible" title="请确认删除" width="500">
             <span>确认删除这个故事吗</span>
             <template #footer>
                 <div class="dialog-footer">
                     <el-button type="primary" @click="handleSure">确认</el-button>
-                    <el-button  @click="dialogVisible = false">
-                       取消
+                    <el-button @click="dialogVisible = false">
+                        取消
                     </el-button>
                 </div>
             </template>
@@ -103,6 +159,17 @@ const dialogVisible = ref(false)
 const postList = ref([])
 
 // const dialogVisible = ref(false) 
+const searchContnet = ref('')
+const searchList = ref([])
+const searchInput = () => {
+    if (searchContnet.value != '') {
+        searchList.value = postList.value.filter(item => item.title.includes(searchContnet.value))
+    } else {
+        searchList.value = []
+    }
+}
+
+
 const statistics = (arr) => {
     arr.forEach((item) => {
         if (item.whoGood) {
@@ -204,9 +271,16 @@ const handleDelete = async (data) => {
 const handleSure = async (data) => {
     dialogVisible.value = false
     console.log(deleteId)
-    let res = await axios.delete(`/adminApi/post/postDelete?id=${deleteId}`)
-    getPostList()
-}   
+    await axios.delete(`/adminApi/post/postDelete?id=${deleteId}`).then(res =>{
+        ElMessage({
+            message: '删除成功.',
+            type: 'success',
+        })
+
+    })
+    await getPostList()
+    searchInput()
+}
 
 
 </script>

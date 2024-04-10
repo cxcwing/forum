@@ -10,7 +10,71 @@
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <el-table size="large" :data="taleList" style="width: 100%">
+        <div class="searchBox">
+            <el-input @input="searchInput" v-model="searchContnet" style="width: 240px" size="large" placeholder="搜索" />
+        </div>
+        <el-table v-if="!searchList.length" size="large" :data="taleList" style="width: 100%">
+            <el-table-column label="封面" width="180">
+                <template #default="scope">
+                    <div v-if="scope.row.cover">
+                        <!-- <el-avatar :size="50"
+                            :src="`http://localhost:3000/${scope.row.cover}`" /> -->
+                            <el-image style="width: 80px; height: 80px" :src="`http://localhost:3000/${scope.row.cover}`" fit="cover" />
+                        </div>
+                    <div v-else>
+                        <!-- <el-avatar :size="50"
+                            src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" /> -->
+                            <el-image style="width: 80px; height: 80px" src="http://localhost:3000/images/1711076201666-QQå¾ç20231130165119.gif" fit="cover" />
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column label="标题" prop="title" width="200" />
+
+            <el-table-column label="类型" width="100">
+                <template #default="scope">
+                    <div v-if="scope.row.type === 0">
+                        <span>非恐怖</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 1">
+                        <span>自创故事</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 2">
+                        <span>据事实改编</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 3">
+                        <span>我有一个朋友</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 4">
+                        <span>搬运</span>
+                    </div>
+                    <div v-else-if="scope.row.type === 5">
+                        <span>我听说</span>
+                    </div>
+                    <div v-else>
+                        <span>恐怖</span>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column width="100" prop="HowGood" label="收藏数" />
+            <el-table-column width="100" prop="HowCollection" label="点赞数" />
+            <el-table-column width="100" prop="HowComment" label="浏览量" />
+            <el-table-column width="120" prop="author" label="作者" />
+            <el-table-column width="120" prop="time" label="更新时间" />
+            <el-table-column fixed="right" label="发布" width="120">
+                <template #default="scope">
+                    <el-switch v-model="scope.row.isPublish" @change="handleSwitchChange(scope.row)" />
+                </template>
+            </el-table-column>
+
+            <el-table-column fixed="right" label="操作" width="180">
+                <template #default="scoe">
+                    <el-button type="primary" @click="handleEdit(scoe.row)" size='small'>编辑</el-button>
+                    <el-button type="danger" @click="handleDelete(scoe.row)" size='small'>删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <el-table v-else size="large" :data="searchList" style="width: 100%">
             <el-table-column label="封面" width="180">
                 <template #default="scope">
                     <div v-if="scope.row.cover">
@@ -99,6 +163,15 @@ import upLoad from '@/util/upLoad';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 // import { ElNotification } from 'element-plus'
 const router = useRouter()
+const searchContnet = ref('')
+const searchList = ref([])
+const searchInput = () => {
+    if (searchContnet.value != '') {
+        searchList.value = taleList.value.filter(item => item.title.includes(searchContnet.value))
+    } else {
+        searchList.value = []
+    }
+}
 
 
 const dialogVisible = ref(false)
@@ -193,8 +266,15 @@ const handleDelete = async (data) => {
 const handleSure = async (data) => {
     dialogVisible.value = false
     console.log(deleteId)
-    let res = await axios.delete(`/adminApi/tale/taleDelete?id=${deleteId}`)
-    getTaleList()
+    await axios.delete(`/adminApi/tale/taleDelete?id=${deleteId}`).then(res =>{
+        ElMessage({
+            message: '删除成功.',
+            type: 'success',
+        })
+
+    })
+    await getTaleList()
+    searchInput()
 }   
 
 
