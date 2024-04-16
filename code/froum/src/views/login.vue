@@ -24,7 +24,7 @@
 
                     <input type="text" v-model="userForm.username" placeholder="用户名" class="input" required>
                     <input type="password" v-model="userForm.password" placeholder="密码" class="input " required>
-                    <a href="#" class="link">忘记密码</a>
+                    <a @click="handleRePassword" class="link">忘记密码</a>
                     <button type="button" class="btn" @click="handleLogin">登陆</button>
                 </div>
             </div>
@@ -205,7 +205,9 @@ const signUp = () => {
     container.value += " panel-active"
 
 }
-
+const handleRePassword = ()=>{
+    router.push('/forget')
+}
 
 
 
@@ -319,6 +321,7 @@ const signUp = () => {
     font-size: 0.9rem;
     margin: 1.5rem 0;
     text-decoration: none;
+    cursor: pointer;
     /*文字装饰*/
 }
 

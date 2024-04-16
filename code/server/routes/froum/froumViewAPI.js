@@ -43,6 +43,7 @@ FroumViewRouter.get('/froumApi/froum/getPostList',FroumController.getPostList)
 FroumViewRouter.get('/froumApi/froum/getPost',FroumController.getPost)
 FroumViewRouter.get('/froumApi/froum/getPostComment',FroumController.getPostComment)
 
-
+FroumViewRouter.post('/froumApi/froum/captchaSendForget',FroumController.captchaSendForget)
+FroumViewRouter.post('/froumApi/froum/rePassword',FroumController.rePassword)
 
 module.exports = FroumViewRouter    

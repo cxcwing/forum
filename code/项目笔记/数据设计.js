@@ -1,17 +1,17 @@
-const { type } = require("os")
+
 let int = 'int'
 let user = {
-    id: 1,
-    username: '名称',
-    password: '密码',
-    email: "邮箱",
-    introduction: '',
-    gender: "性别",
-    role: '身份',
-    avatar: "",//头像
-    vip: '',
-    jionTime: '注册时间',
-    account: "账号"
+    id: int,
+    username: 'varchar(16)',
+    password: 'varchar(16)',
+    email: "varchar(50)",
+    introduction: 'text',
+    gender: "int",
+    role: '	int',
+    avatar: "text",//头像
+    vip: 'int',
+    jionTime: 'datetime',
+    account: "int"
 }
 let users = {
     _id: int,

@@ -11,7 +11,7 @@ const mailerConfig = {
     secure: true,
     auth: {
         user: 'cunxicao@163.com',
-        pass: ''
+        pass: 'VLHOSBIHMYKMPZIV'
     }
 }
 const maileOption = (email, Captcha) => {
@@ -25,8 +25,27 @@ const maileOption = (email, Captcha) => {
         宝贝您好！
     
         欢迎注册草吧，您的验证码是 :${Captcha}
-        
-  
+    `,
+        // attachments:[{   发送附件
+        //     filename:'',
+        //     path:''  地址
+        // }]
+    }
+}
+
+const maileOptionForget = (email, Captcha) => {
+    return {
+
+        from: 'cunxicao@163.com',
+        to: email,
+        subject: `草吧验证信息，您的验证码是:${Captcha}`,
+        text: `
+   
+        宝贝您好！
+    
+        您的验证码是 :${Captcha}
+
+        凭此重置密码
     `,
         // attachments:[{   发送附件
         //     filename:'',
@@ -47,14 +66,14 @@ const sqlPool = mysql.createPool({
 
 const transporter = nodemailer.createTransport(mailerConfig)
 async function saveCaptcha(idCode, createtime, email) {
-  
+
     await sqlPool.query(`insert into token (idCode,createtime,email) values (?,?,?)`, [idCode, createtime, email])
 }
 async function searchCaptcha(captcha, email) {
     let data = await sqlPool.query('select * from token where idCode = ? and email = ?', [captcha, email])
     return data[0]
 }
-async function toRegister(username, email, password, captcha) {
+async function toRegister(username, email, password,captcha) {
     await sqlPool.query(`insert into users (username,email,password) values (?,?,?)`, [username, email, password])
     await sqlPool.query(`delete from token where idCode=? and email=?`, [captcha, email])
 }
@@ -212,21 +231,25 @@ async function toDeleteUserTale(id) {
 }
 async function toAddUserPost(title, type, content, author, authorId, time, cover) {
     await sqlPool.query('insert into `post`(`title`,`type`,`content`,`author`,`authorId`,`time`,`cover`) values (?,?,?,?,?,?,?)', [title, type, content, author, authorId, time, cover])
-    await sqlPool.query('update users set postNum = postNum + 1 where _id=?',[authorId])
+    await sqlPool.query('update users set postNum = postNum + 1 where _id=?', [authorId])
 }
 async function toAddUserTale(title, type, content, author, authorId, time, cover) {
     await sqlPool.query('insert into `tale`(`title`,`type`,`content`,`author`,`authorId`,`time`,`cover`) values (?,?,?,?,?,?,?)', [title, type, content, author, authorId, time, cover])
-    await sqlPool.query('update users set taleNum = taleNum + 1 where _id=?',[authorId])
+    await sqlPool.query('update users set taleNum = taleNum + 1 where _id=?', [authorId])
 }
-async function toPostUpdate(id,title,type,content,author,authorId,time,cover){
-    await sqlPool.query(`update users set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`,[title,type,content,author,authorId,time,cover,id])
-  
+async function toPostUpdate(id, title, type, content, author, authorId, time, cover) {
+    await sqlPool.query(`update users set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`, [title, type, content, author, authorId, time, cover, id])
+
 }
 
-async function toTaleUpdate(id,title,type,content,author,authorId,time,cover){
-    await sqlPool.query(`update tale set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`,[title,type,content,author,authorId,time,cover,id])
+async function toTaleUpdate(id, title, type, content, author, authorId, time, cover) {
+    await sqlPool.query(`update tale set title = ?,type = ?,content = ?,author = ?,authorId = ?,time = ?,cover = ? where id = ?`, [title, type, content, author, authorId, time, cover, id])
 }
 
+async function passwordUpdate(email,password,captcha){
+    await sqlPool.query(`delete from token where idCode=? and email=?`, [captcha, email])
+    await sqlPool.query(`update users set password = ? where email = ?`,[password,email])
+}
 
 const froumController = {
     getPostList: async (req, res) => {
@@ -245,7 +268,7 @@ const froumController = {
 
         let end = num * page
         let begin = end - num
-  
+
         if (searchRes.length && begin <= searchRes.length) {
             // console.log(data)
 
@@ -319,12 +342,12 @@ const froumController = {
         maileOption.to = req.body.email
         let Captcha = parseInt(Math.random() * 1000000)
         let createTime = new Date().getTime()
-   
+
         await saveCaptcha(Captcha, createTime, req.body.email)
-    
+
         transporter.sendMail(maileOption(req.body.email, Captcha), (err, info) => {
             if (err) {
-    
+
                 res.send({
                     ok: 0,
                     data: '发送失败请稍后重试'
@@ -339,8 +362,32 @@ const froumController = {
         })
 
     },
+    captchaSendForget: async (req, res) => {
+        maileOption.to = req.body.email
+        let Captcha = parseInt(Math.random() * 1000000)
+        let createTime = new Date().getTime()
+
+        await saveCaptcha(Captcha, createTime, req.body.email)
+        
+        transporter.sendMail(maileOptionForget(req.body.email, Captcha), (err, info) => {
+            if (err) {
+
+                res.send({
+                    ok: 0,
+                    data: '发送失败请稍后重试'
+                })
+            } else {
+                console.log('邮件发送' + info.response)
+                res.send({
+                    ok: 1,
+                    data: '发送成功'
+                })
+            }
+        })
+    },
+
     register: async (req, res) => {
-     
+
         let { username, email, password, captcha } = req.body
         let searchRes = await searchCaptcha(captcha, email)
 
@@ -350,9 +397,9 @@ const froumController = {
 
         if (searchRes.length) {
             let time = parseInt((new Date().getTime() - searchRes[0].createtime) / 1000)
-  
+
             let isUserNameRes = await isUserName(username)
-            console
+ 
             if (isUserNameRes.length) {
                 res.send({
                     ok: 0,
@@ -367,7 +414,7 @@ const froumController = {
                     })
                 } else {
                     if (time <= 3600) {
-                        await toRegister(username, email, password)
+                        await toRegister(username, email,password,captcha)
                         res.send({
                             ok: 1,
                         })
@@ -390,8 +437,36 @@ const froumController = {
 
 
     },
+
+    rePassword:async(req,res)=>{
+        let {email,password,captcha} = req.body
+        let searchRes = await searchCaptcha(captcha, email)
+
+        if(searchRes.length){
+            let time = parseInt((new Date().getTime() - searchRes[0].createtime) / 1000)
+            if(time <= 3600){
+                await passwordUpdate(email,password,captcha)
+                res.send({
+                    ok:1,
+                    data:'密码修改成功'
+                })
+            }else{
+                res.send({
+                    ok:0,
+                    errorInfo:'验证码超时'
+                })
+            }
+        }else{
+            res.send({
+                ok:0,
+                errorInfo:'验证码错误'
+            })
+        }
+    },
+
+
     login: async (req, res) => {
-      
+
 
         let { username, password } = req.body
         let user = await toLogin(username, password)
@@ -521,7 +596,7 @@ const froumController = {
 
         let id = parseInt(req.query.id)
         let searchRes = await toGetTaleComment(id)
-    
+
         res.send({
             ok: 1,
             data: searchRes
@@ -636,7 +711,7 @@ const froumController = {
         let searchRes = await toAddPostLike(likeArr, num, userGood, taleId, userId)
         if (searchRes.length) {
             let data = searchRes[0]
-            delete data.password 
+            delete data.password
             if (data.toGood) {
                 data.toGood = JSON.stringify(data.toGood)
             }
@@ -983,25 +1058,25 @@ const froumController = {
         let { id, title, type, content, author, authorId } = req.body
         id = parseInt(id)
         authorId = parseInt(authorId)
-      
+
         await toPostUpdate(id, title, type, content, author, authorId, time, cover)
         res.send({
             ok: 1
         })
     },
-    taleUpdate:async (req,res)=>{
-        
+    taleUpdate: async (req, res) => {
+
         let cover = `/${req.file.destination.split('/')[1]}/${req.file.filename}`
         // console.log(cover)
         let time = new Date()
         // console.log(time.getDate())
-       
+
         // console.log(time, moment().format('lll') )
-        let {id,title,type,content,author,authorId} = req.body
-        await toTaleUpdate(id,title,type,content,author,authorId,time,cover)
+        let { id, title, type, content, author, authorId } = req.body
+        await toTaleUpdate(id, title, type, content, author, authorId, time, cover)
         res.send({
-            ok:1 
-        }) 
+            ok: 1
+        })
     },
 }
 
