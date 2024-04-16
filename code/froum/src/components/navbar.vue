@@ -42,7 +42,7 @@
                             <span class="power">能量 :{{ userForm.power }}</span>
                         </div>
                         <div class="goodBox">
-                            <div class="good">
+                            <div @click="handlecollection" class="good">
                                 <p class="goodTop">{{ howCollection }}</p>
                                 <p class="goodFooter goodFooter">收藏</p>
                             </div>
@@ -56,7 +56,7 @@
                             </div>
 
                         </div>
-                        <div class="guangGao">广告位招租 </div>
+                        <div class="guangGao">意见征集 </div>
                         <div @click="handleCenter" class="center goToBox">
                             <el-icon>
                                 <User />
@@ -111,7 +111,7 @@
                             </div>
 
                         </div>
-                        <div class="guangGao">广告位招租</div>
+                        <div class="guangGao">意见征集</div>
                         <div class="center goToBox">
                             <el-icon>
                                 <User />
@@ -234,6 +234,9 @@ const handleInput = (evt) => {
 
 
 
+}
+const handlecollection = ()=>{
+    router.push(`/home/center`)
 }
 const handleTale = () => {
     router.push(`/controll/taleList`)

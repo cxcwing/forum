@@ -15,8 +15,9 @@
   }
   .ck-editor__editable_inline:not(.ck-comment__input *) {
     /* width: 80%; */
+    top:30vh;
     min-height: 400px;
     overflow-y: auto;
-    max-height: 700px;
+    max-height: 600px;
 }
 </style>

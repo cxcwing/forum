@@ -35,9 +35,9 @@
                         </el-form-item>
                         <el-form-item :size="'large'" label="性别"   prop="region">
                             <el-select  v-model="userForm.gender" placeholder="Activity zone" class="sel">
-                                <el-option label="保密" value="0" />
-                                <el-option label="男" value="1" />
-                                <el-option label="女" value="2" />
+                                <el-option label="保密" :value="0" />
+                                <el-option label="男" :value="1" />
+                                <el-option label="女" :value="2" />
                             </el-select>
                         </el-form-item>
                         <el-form-item label="个人介绍" prop="introduction">

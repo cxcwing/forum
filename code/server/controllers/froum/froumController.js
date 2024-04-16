@@ -193,8 +193,11 @@ async function toGetThePost(id) {
 async function toUserUpdate(_id, username, gender, introduction, avatar) {
     if (avatar != '') {
         await sqlPool.query(`update users set username=?,gender=?,introduction=?,avatar=? where _id=?`, [username, gender, introduction, avatar, _id])
+        
+        await sqlPool.query(`update comment set userAvatar = ? where userId = ?`,[avatar,_id])
     } else {
         await sqlPool.query(`update users set username=?,gender=?,introduction=? where _id=?`, [username, gender, introduction, _id])
+
     }
 }
 async function toGetLike(list) {
