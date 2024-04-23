@@ -50,9 +50,10 @@ const checkPerminssion = (item) => {
 
 }
 
+
 router.beforeEach((to, from, next) => {
   if (to.name === "login") {
-    console.log('login')
+    // console.log('login')
     next()
   } else {
     //如果授权(已经登录过了) next()
@@ -63,9 +64,9 @@ router.beforeEach((to, from, next) => {
         path: "/login"
       })
     } else {
-      console.log('yes',store.state.isAddRouter)
+      // console.log('yes',store.state.isAddRouter)
       if (!store.state.isAddRouter) {
-        console.log('aaa')
+        // console.log('aaa')
         router.removeRoute("mainBox")
 
         ConfigRouter()

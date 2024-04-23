@@ -254,6 +254,13 @@ async function passwordUpdate(email,password,captcha){
     await sqlPool.query(`update users set password = ? where email = ?`,[password,email])
 }
 
+async function toGetSearchList(title){
+    let res1 =await sqlPool.query(`select * from post where title like ?`,[`%${title}%`])
+    let res2 =await sqlPool.query(`select * from tale where title like ?`,[`%${title}%`])
+    let data = [...res1[0],...res2[0]]
+    return data
+}
+
 const froumController = {
     getPostList: async (req, res) => {
         let id = parseInt(req.query.id)
@@ -1081,6 +1088,16 @@ const froumController = {
             ok: 1
         })
     },
+    getSearchList:async (req,res) =>{
+        console.log(req.query.title)
+        let title = req.query.title
+        let searchRes = await toGetSearchList(title)
+            
+        res.send({
+            ok:1,
+            data:searchRes
+        })
+    }
 }
 
 

@@ -11,14 +11,14 @@
                 <el-menu-item index="/post">贴子</el-menu-item>
                 <!-- <el-menu-item index="/home">个人中心</el-menu-item> -->
                 <div class="searchInput">
-                    <el-input id="search" @input="handleInput" v-model="search" size="large"
+                    <el-input id="search" @blur="handleBlur" @focus="handleFocus" @input="handleInput" v-model="search" size="large"
                         style=" min-width: 400px;max-width: 500px;" placeholder="搜索" class="input-with-select">
                         <template #append>
                             <el-button :icon="Search" />
                         </template>
                     </el-input>
-                    <div v-if="searchList.length" class="search-ul">
-                        <div v-for="item in searchList" :key="item.id" class="search-li" @click="handleTo(item.id)">
+                    <div v-show="isShowSearch" v-if="searchList.length" class="search-ul">
+                        <div v-for="item in searchList" :key="item.id" class="search-li" @click="handleTo(item)">
                             {{ item.title }}
                         </div>
 
@@ -145,7 +145,7 @@
                     </div>
                 </div>
                 <div class="toLogin" v-if="!isLogin">
-                    <el-button type="success" plain @click="handleToLogin" >点击登陆</el-button>
+                    <el-button type="success" plain @click="handleToLogin">点击登陆</el-button>
                 </div>
 
             </el-menu>
@@ -172,6 +172,7 @@ const form = ref('form')
 const avatarClass = ref('one')
 const idLevel = ref('idLevel')
 const searchList = ref([])
+const isShowSearch = ref(true)
 const whatRole = () => {
     if (store.state.userFormInfo.level <= 4) {
         return '普通用户'
@@ -192,13 +193,15 @@ const mouseOut = () => {
     form.value = 'form'
     avatarClass.value = 'one'
 }
-const handleTo = (id) => {
-    let arr2 = window.location.href.split('/')
-    if (arr2[arr2.length - 1].includes('post')) {
-        router.push(`/post-view/${id}`)
-    } else if (arr2[arr2.length - 1].includes('tale')) {
-        router.push(`/tale-view/${id}`)
+const handleTo = (item) => {
+
+    if(item.isPost){
+        router.push(`/post-view/${item.id}`)
+    }else{
+        router.push(`/tale-view/${item.id}`)
     }
+
+
 
     search.value = ''
     searchList.value = []
@@ -208,34 +211,43 @@ const handleExit = () => {
     localStorage.removeItem('vuex')
     window.location.href = '/login'
 }
-const handleInput = (evt) => {
 
-    let arr2 = window.location.href.split('/')
+function debounce(fun, wait) {
+    let time
+    return (...params) => {
 
-    if (arr2[arr2.length - 1].includes('post')) {
-
-        if (evt) {
-            searchList.value = store.state.postList.filter((item) => item.title.includes(evt))
-
-
-        } else {
-            searchList.value = []
+        if (time) {
+            clearTimeout(time)
         }
-    } else if (arr2[arr2.length - 1].includes('tale')) {
+        time = setTimeout(() => {
+            fun(...params)
 
-        if (evt) {
-            searchList.value = store.state.taleList.filter((item) => item.title.includes(evt))
-
-        } else {
-            searchList.value = []
-        }
+        }, wait)
     }
-
-
-
-
 }
-const handlecollection = ()=>{
+let searchDebounce = debounce(async (evt)=>{
+   
+    let res = await axios.get(`/froumApi/froum/getSearchList?title=${evt}`)
+    if(res.data.ok){
+        searchList.value = res.data.data
+    }else{
+        searchList.value = []
+    }
+},800)
+
+
+
+const handleInput = (evt) => {
+    searchDebounce(evt)
+}
+const handleFocus = ()=>{
+    isShowSearch.value = true
+}
+const handleBlur = ()=>{
+    isShowSearch.value = false
+}
+
+const handlecollection = () => {
     router.push(`/home/center`)
 }
 const handleTale = () => {
@@ -324,11 +336,13 @@ const handleController = () => {
     background-image: linear-gradient(45deg, #8bfff4 0%, #2bffdc 52%, #2bff6c 88%);
 
 }
-.toLogin{
+
+.toLogin {
     height: 100%;
     line-height: 60px;
     margin-left: 70px;
 }
+
 .goodTop {
     font-size: 20px;
 
@@ -495,7 +509,7 @@ const handleController = () => {
     background-color: white;
     height: 40px;
     line-height: 40px;
-    padding-left: 2px;
+    padding-left: 10px;
     color: #414241;
 }
 
