@@ -11,7 +11,7 @@ const mailerConfig = {
     secure: true,
     auth: {
         user: 'cunxicao@163.com',
-        pass: ''
+        pass: 'VLHOSBIHMYKMPZIV'
     }
 }
 const maileOption = (email, Captcha) => {
