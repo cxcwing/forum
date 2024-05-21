@@ -10,8 +10,8 @@ const mailerConfig = {
     port: 465,
     secure: true,
     auth: {
-        user: 'cunxicao@163.com',
-        pass: ''
+        user: 'cunxicao@163.com', //改为自己的
+        pass: '' //改
     }
 }
 const maileOption = (email, Captcha) => {

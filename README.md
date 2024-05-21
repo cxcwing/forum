@@ -1,3 +1,5 @@
+
+
 ### 项目展示
 
 #### 登陆/注册
@@ -20,7 +22,9 @@
 
 ![](https://github.com/cxcwing/forum/blob/master/remadme/3.png)
 
-<img src="E:\.论坛\remadme\4.png"  />
+![](https://github.com/cxcwing/forum/blob/master/remadme/4.png)
+
+
 
 #### 个人中心
 
