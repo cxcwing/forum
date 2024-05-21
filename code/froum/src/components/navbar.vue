@@ -25,8 +25,8 @@
 
                     </div>
                 </div>
-                <div class='avatar'>
-                    <el-avatar v-if="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut" :class="avatarClass"
+                <div class='avatar' @mouseover="avatarHover" @mouseout="mouseOut" >
+                    <el-avatar v-if="userForm.avatar" :class="avatarClass"
                         :size="40" :src='`http://localhost:3000${store.state.userFormInfo.avatar}`' />
                     <el-avatar v-else="userForm.avatar" @mouseover="avatarHover" @mouseout="mouseOut"
                         :class="avatarClass" :size="40" :src='`http://localhost:3000/images/1711108153245-0.png`' />
@@ -87,6 +87,7 @@
                             </el-icon>
                         </div>
                     </div>
+                    
                     <div v-else="userForm._id" @mouseover="avatarHover" @mouseout="mouseOut" :class="form">
                         <span class="username">{{ userForm.username }}</span>
                         <div class="idLevelBox">
