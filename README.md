@@ -1,4 +1,4 @@
-
+提示:后端验证码发送部分server/controllers/froumController.js  -> mailerConfig对象中需正确配置自己的邮箱
 
 ### 项目展示
 

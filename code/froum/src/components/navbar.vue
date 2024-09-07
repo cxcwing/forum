@@ -5,11 +5,11 @@
             <el-menu :router="true" :ellipsis="false" active-text-color="#02c9a6" id="el-menu"
                 :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                 <div class="logo">
-                    草吧
+                    易言
                 </div>
                 <el-menu-item index="/tale">故事</el-menu-item>
                 <el-menu-item index="/post">贴子</el-menu-item>
-                <!-- <el-menu-item index="/home">个人中心</el-menu-item> -->
+            
                 <div class="searchInput">
                     <el-input id="search" @blur="handleBlur" @focus="handleFocus" @input="handleInput" v-model="search" size="large"
                         style=" min-width: 400px;max-width: 500px;" placeholder="搜索" class="input-with-select">
